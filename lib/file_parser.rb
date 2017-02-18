@@ -1,3 +1,4 @@
+require "console_runner/version"
 require 'yard'
 require 'console_runner_error'
 
