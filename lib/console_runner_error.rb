@@ -1,0 +1,1 @@
+class ConsoleRunnerError < Exception; end

@@ -1,0 +1,83 @@
+require "console_runner/version"
+
+require 'trollop'
+
+require '../lib/file_parser'
+require '../lib/cmd_parser'
+require '../lib/runner'
+
+file_path         = ENV['DEBUG_FILE']
+file_path       ||= File.realpath ARGV.shift
+file_parser       = FileParser.new(file_path)
+
+
+runnable_classes  = file_parser.list_classes(:runnable)
+raise "One runnable Class should be specified in file.
+Runnable class should be marked with @#{FileParser::RUNNABLE_TAG.to_s} tag" if runnable_classes.count != 1
+
+clazz             = runnable_classes.first
+all_methods       =  file_parser.list_methods(:all, clazz)
+runnable_methods  = file_parser.list_methods(:runnable, clazz)
+initialize_method = all_methods.find{|m| m.name == :initialize}
+run_method        = all_methods.find{|m| m.name == :run}
+
+
+cmd_parser = CmdParser.new(runnable_methods, initialize_method)
+cmd = ARGV[0]
+action_method = runnable_methods.find { |m| m.name.to_s ==  cmd } # get the subcommand
+cmd_parser.parse_method  action_method
+raise "Cannot run #{cmd} command because method is nil" unless action_method
+
+
+puts "======================================================="
+puts "Global options:"
+puts cmd_parser.global_opts.map{|k,v| "     #{k} = #{v}" }.join("\n")
+if initialize_method
+puts "INIT: #{initialize_method.name}"
+puts "INIT options:"
+puts cmd_parser.init_method.cmd_opts.map{|k,v| "     #{k} = #{v}" }.join("\n")
+end
+puts "Subcommand: #{action_method.name}"
+puts "Subcommand options:"
+puts cmd_parser.method.cmd_opts.map{|k,v| "     #{k} = #{v}" }.join("\n")
+puts "Remaining arguments: #{ARGV.inspect}" if ARGV != []
+puts "======================================================="
+
+
+Runner.run{
+  require file_path
+  class_full_name = clazz.title
+  raise "#{class_full_name} is not defined" unless Module.const_defined?(class_full_name)
+  klass_obj = Module.const_get(class_full_name)
+  method_type = action_method.scope
+  method_params = cmd_parser.method.params_array
+
+  case method_type
+    when :class
+      klass_obj.send(action_method.name, *method_params)
+    when :instance
+      init_params = cmd_parser.init_method.params_array
+      # TODO catch errors
+      obj = klass_obj.new(*init_params)
+      obj.send(action_method.name, *method_params)
+    else
+      raise "Unknown method type: #{method_type}"
+  end
+
+}
+
+
+
+
+
+
+
+
+
+
+# raise "#{clazz.name}#initialize method should be specified" unless initialize_method
+#
+# raise "At least one method should be marked with @#{FileParser::RUNNABLE_TAG.to_s} tag.
+# Also you may specify #run method and it will be executed by default.
+# #run method don't need any code annotations as well." if runnable_methods.count == 0 unless run_method
+
