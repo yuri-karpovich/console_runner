@@ -1,3 +1,5 @@
+require 'trollop'
+
 class CmdParser
 
   class ParsedMethod
@@ -155,7 +157,10 @@ Use different names to `console_runner` be able to run #{@method.name} method." 
         @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: CmdParser.parse_type(tag_type))
       end
     end
-    cmd_opts = @parser.parse ARGV
+    cmd_opts = Trollop::with_standard_exception_handling @parser do
+      raise Trollop::HelpNeeded if ARGV.empty? # show help screen
+      @parser.parse ARGV
+    end
     given_attrs = cmd_opts.keys.select { |k| k.to_s.include? '_given' }.map { |k| k.to_s.gsub('_given', '').to_sym }
 
     @method.cmd_opts = cmd_opts.select { |k, v| given_attrs.include? k }

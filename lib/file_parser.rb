@@ -72,3 +72,12 @@ end
 
 # YARD::Tags::Library.define_tag "Run in Console", :runnable, :with_types_and_name
 YARD::Tags::Library.define_tag "Console Tool Description", FileParser::RUNNABLE_TAG
+
+module YARD
+  module CLI
+    class Stats < Yardoc
+      def print_statistics; end
+      def print_undocumented_objects; end
+    end
+  end
+end

@@ -1,19 +1,5 @@
-class BaseClass
+require_relative '../assets/asset_base'
 
-  def initialize(options)
-    message = options[:message]
-    raise ':message is required' unless message
-    puts "#{self.class}#initialize: #{message}"
-  end
-end
-
-class NotRunnableClass < BaseClass
-  def initialize
-    super(message: 'Not runnable class')
-  end
-end
-module SuperRunModule
-module RunModule
 # This is common Ruby class with common YARD annotation.
 # Nothing special here except @runnable tag. This is a `console_runner` tag that shows that this class can be runnable
 # via bash command line.
@@ -29,12 +15,12 @@ module RunModule
 #   You can use multiline text as well.
 #
 # @since 0.1.0
-class RunnableClass < BaseClass
+class RunnableClass < AssetBase
 
   # This method is executed in case you perform instance action. It's not necessary to mark this method with @runnable tag.
   # @param [String] text INIT METHOD
-  def initialize(text)
-    super(message: 'INITIALIZE IN RUN CLASS' + text.to_s)
+  def initialize
+    super
   end
 
   # This is instance action you may perform.
@@ -51,8 +37,8 @@ class RunnableClass < BaseClass
   # @option options2 [Fixnum] :scenario Cucumber scenario object. Used fot tmp directory generation (required).
   # @option options2 [String] :jira_project_key JIRA project key (optional).
   # @option options2 [Boolean] :build_time Time used to generate tokens such as $WEEK, $DAY_OF_WEEK. Current time is used by default (optional).
-  def action(server, array_or_strings=2, options2={} )
-    puts 'Instance action with parameters'
+  def action(server=1, array_or_strings=2, options2={} )
+    super()
   end
 
   # This is class action you may perform.
@@ -60,10 +46,7 @@ class RunnableClass < BaseClass
   # @runnable This text will be shown in class action --help menu.
   # @param [String] server  name of server
   def self.class_action(server= 1)
-    puts "Server: #{server} #{server.class}"
-    puts 'Class action with parameters'
+    super()
   end
 
-end
-end
 end
