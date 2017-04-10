@@ -1,6 +1,5 @@
 module Runner
 
-
   def self.run &block
     start_time = Time.now
     puts "Start Time: #{start_time}"
@@ -10,7 +9,7 @@ module Runner
 
     trap 'SIGCHLD' do
       loop do
-        pid = Process.waitpid( -1, Process::WNOHANG ) rescue nil
+        pid = Process.waitpid(-1, Process::WNOHANG) rescue nil
         break unless pid
       end
     end

@@ -1,7 +1,8 @@
-require "console_runner/version"
 require 'yard'
+require 'console_runner/version'
 require 'console_runner_error'
 
+# Parses code in a file
 class FileParser
   attr_reader :all_objects
 
@@ -19,9 +20,11 @@ class FileParser
   end
 
 
-  # @param [YARD::CodeObjects::ClassObject] clazz class object
+  # List methods
+  # @param [Symbol] scope :all - list all methods, :runnable - list only runnable methods
+  # @param [YARD::CodeObjects::ClassObject, nil] clazz list methods of specified class only
   def list_methods(scope= :all, clazz = nil)
-    all_methods = @all_objects.select { |o| o.type == :method }
+    all_methods       = @all_objects.select { |o| o.type == :method }
     all_class_methods = []
     all_class_methods = clazz.children.select { |m| m.class == YARD::CodeObjects::MethodObject } if clazz
 
@@ -39,11 +42,12 @@ class FileParser
           all_methods.select { |m| m.has_tag? RUNNABLE_TAG }
         end
       else
-        raise ':key can be :all or :runnable'
+        raise ":key can be :all or #{RUNNABLE_TAG}"
     end
-
   end
 
+  # List classes
+  # @param [Symbol] scope :all - list all classes, :runnable - list only runnable classes
   def list_classes(scope= :all)
     all_classes = @all_objects.select { |o| o.type == :class }
     case scope
@@ -57,26 +61,27 @@ class FileParser
   end
 
   def self.select_runnable_tags(yard_object)
-    yard_object.tags.select{|t| t.tag_name == RUNNABLE_TAG.to_s }
+    yard_object.tags.select { |t| t.tag_name == RUNNABLE_TAG.to_s }
   end
 
   def self.select_option_tags(yard_object)
-    yard_object.tags.select{|t| t.tag_name == 'option' }
+    yard_object.tags.select { |t| t.tag_name == 'option' }
   end
 
   def self.select_param_tags(yard_object)
-    yard_object.tags.select{|t| t.tag_name == 'param' }
+    yard_object.tags.select { |t| t.tag_name == 'param' }
   end
 
 end
 
 # YARD::Tags::Library.define_tag "Run in Console", :runnable, :with_types_and_name
-YARD::Tags::Library.define_tag "Console Tool Description", FileParser::RUNNABLE_TAG
+YARD::Tags::Library.define_tag 'Console Tool Description', FileParser::RUNNABLE_TAG
 
 module YARD
   module CLI
     class Stats < Yardoc
       def print_statistics; end
+
       def print_undocumented_objects; end
     end
   end

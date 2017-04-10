@@ -1,28 +1,31 @@
 require 'trollop'
 
+# Parses command line
 class CmdParser
 
+  # Parses method code
   class ParsedMethod
     attr_reader :method, :name, :param_tags, :option_tags
     attr_accessor :cmd_opts
+
     def initialize(method)
-      @method = method
-      @name = @method.name
-      @parameters = @method.parameters
-      @param_tags = FileParser.select_param_tags @method
+      @method      = method
+      @name        = @method.name
+      @parameters  = @method.parameters
+      @param_tags  = FileParser.select_param_tags @method
       @option_tags = FileParser.select_option_tags @method
-      @cmd_opts = nil
+      @cmd_opts    = nil
     end
 
     def params_array
       expected_params = @parameters.map(&:first).map.with_index { |p, i| [i, p] }.to_h
-      options_groups = {}
-      get_params = {}
+      options_groups  = {}
+      get_params      = {}
 
       expected_params.each do |index, name|
-        if is_options_group?(name)
+        if options_group?(name)
           options_groups[index] = name
-          get_params[index] = option_as_hash(name)
+          get_params[index]     = option_as_hash(name)
         else
           get_params[index] = @cmd_opts[name.to_sym]
         end
@@ -31,8 +34,8 @@ class CmdParser
 
       stop_delete = false
       get_params.delete_if do |a|
-        index = a[0]
-        value = a[1]
+        index  = a[0]
+        value  = a[1]
         result = false
 
         if options_groups[index]
@@ -48,7 +51,6 @@ class CmdParser
       get_params.sort_by { |a| a[0] }.map { |a| a[1] }
     end
 
-
     def param_tags_names
       param_tags.map { |t| t.name }
     end
@@ -57,17 +59,29 @@ class CmdParser
       option_tags.map { |t| t.pair.name.gsub(':', '') }
     end
 
-    private
-
-    def is_options_group?(param_name)
+    def options_group?(param_name)
       option_tags.any? { |t| t.name == param_name }
     end
+
+    def default_params
+      @parameters.map do |array|
+        array.map do |a|
+          if a
+            ['"', "'"].include?(a[0]) && ['"', "'"].include?(a[-1]) ? a[1..-2] : a
+          else
+            a
+          end
+        end
+      end.to_h
+    end
+
+    private
 
     def option_as_hash(options_group_name)
       result = {}
       option_tags.select { |t| t.name == options_group_name }.each do |t|
-        option_name = t.pair.name.gsub(':', '')
-        option_value = @cmd_opts[option_name.to_sym]
+        option_name         = t.pair.name.gsub(':', '')
+        option_value        = @cmd_opts[option_name.to_sym]
         result[option_name] = option_value if option_value
       end
       result
@@ -78,9 +92,9 @@ class CmdParser
 
   # Should be executed before ARGV.shift
   def initialize(runnable_methods, init_method= nil)
-    clazz = runnable_methods.first.parent
+    clazz        = runnable_methods.first.parent
     sub_commands = runnable_methods.map { |m| m.name.to_s }
-    @parser = Trollop::Parser.new
+    @parser      = Trollop::Parser.new
     @parser.banner(FileParser.select_runnable_tags(clazz).map { |t| (t.text + "\n") }.join("\n"))
     @parser.stop_on sub_commands
 
@@ -123,7 +137,7 @@ Use different names to `console_runner` be able to run #{@init_method.name} meth
     end
 
     if @init_method
-      given_attrs = @global_opts.keys.select { |k| k.to_s.include? '_given' }.map { |k| k.to_s.gsub('_given', '').to_sym }
+      given_attrs           = @global_opts.keys.select { |k| k.to_s.include? '_given' }.map { |k| k.to_s.gsub('_given', '').to_sym }
       @init_method.cmd_opts = @global_opts.select { |k, v| given_attrs.include? k }
     end
   end
@@ -131,13 +145,13 @@ Use different names to `console_runner` be able to run #{@init_method.name} meth
 
   def parse_method(method)
     ARGV.shift
-    @method = ParsedMethod.new method
+    @method      = ParsedMethod.new method
     same_methods = @method.param_tags_names & @method.option_tags_names
     raise "You have the same name for @param and @option attribute(s): #{same_methods.join(', ')}.
 Use different names to `console_runner` be able to run #{@method.name} method." if same_methods.count > 0
+    method_params_tags = @method.param_tags
 
-
-    @method.param_tags.each do |tag|
+    method_params_tags.each do |tag|
       tag_name = tag.name
       tag_text = tag.text
       tag_type = tag.type
@@ -157,13 +171,25 @@ Use different names to `console_runner` be able to run #{@method.name} method." 
         @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: CmdParser.parse_type(tag_type))
       end
     end
-    cmd_opts = Trollop::with_standard_exception_handling @parser do
-      raise Trollop::HelpNeeded if ARGV.empty? # show help screen
+    cmd_opts         = Trollop::with_standard_exception_handling @parser do
+      unless method_params_tags.count.zero?
+        raise Trollop::HelpNeeded if ARGV.empty?
+      end
+      # show help screen
       @parser.parse ARGV
     end
-    given_attrs = cmd_opts.keys.select { |k| k.to_s.include? '_given' }.map { |k| k.to_s.gsub('_given', '').to_sym }
-
+    given_attrs      = cmd_opts.keys.select { |k| k.to_s.include? '_given' }.map { |k| k.to_s.gsub('_given', '').to_sym }
     @method.cmd_opts = cmd_opts.select { |k, v| given_attrs.include? k }
+    @method.default_params.each do |k, v|
+      @method.cmd_opts[k.to_sym] ||= v
+    end
+
+    method_params_tags.select { |t| t.tag_name == 'param' }.map(&:name).each do |required_param|
+      next if @method.options_group? required_param
+      unless @method.cmd_opts[required_param.to_sym]
+        raise "You must specify required parameter: #{required_param}"
+      end
+    end
   end
 
   def self.parse_type(yard_type)
