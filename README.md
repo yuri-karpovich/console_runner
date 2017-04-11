@@ -1,8 +1,12 @@
 # ConsoleRunner
+[![Gem Version][GV img]][Gem Version]
+[![Build Status][BS img]][Build Status]
+[![Dependency Status][DS img]][Dependency Status]
+[![Code Climate][CC img]][Code Climate]
+[![Coverage Status][CS img]][Coverage Status]
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/console_runner`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+This gem provides you an ability to run any Ruby method from command-line (no any code modifications required!!!).
+One thing you need to do is to add an [YARD](http://yardoc.org/) tag annotation `@runnable`.
 
 ## Installation
 
@@ -32,10 +36,23 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/console_runner.
+Bug reports and pull requests are welcome on GitHub at https://github.com/yuri-karpovich/console_runner.
 
 
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 
+
+[Gem Version]: https://rubygems.org/gems/console_runner
+[Build Status]: https://travis-ci.org/yuri-karpovich/console_runner
+[travis pull requests]: https://travis-ci.org/yuri-karpovich/console_runner/pull_requests
+[Dependency Status]: https://gemnasium.com/github.com/yuri-karpovich/console_runner
+[Code Climate]: https://codeclimate.com/github/yuri-karpovich/console_runner
+[Coverage Status]: https://coveralls.io/github/yuri-karpovich/console_runner
+
+[GV img]: https://badge.fury.io/rb/console_runner.png
+[BS img]: https://travis-ci.org/yuri-karpovich/console_runner.svg?branch=master
+[DS img]: https://gemnasium.com/badges/github.com/yuri-karpovich/console_runner.svg
+[CC img]: https://codeclimate.com/github/yuri-karpovich/console_runner.png
+[CS img]: https://coveralls.io/repos/github/yuri-karpovich/console_runner/badge.svg
