@@ -1,3 +1,5 @@
+require_relative './exit_codes'
+
 # This is basic Ruby class with YARD annotation.
 # Nothing special here except @runnable tag. This is a `console_runner` tag that
 # shows that this class can be runnable via bash command line.
@@ -14,24 +16,10 @@
 #
 # @since 0.1.0
 class RunnableClass
-
+  include ExitCodes
   INITIALIZER_MESSAGE  = 'IN INITIALIZE METHOD'.freeze
   ACTION_MESSAGE       = 'IN ACTION METHOD'.freeze
   CLASS_ACTION_MESSAGE = 'IN CLASS ACTION METHOD'.freeze
-  EXIT_CODES           = {
-    single_param_action:                 20,
-    class_single_param_action:           21,
-    action_with_options:                 22,
-    class_action_with_options:           23,
-    action_not_runnable:                 24,
-    class_action_not_runnable:           25,
-    no_param_action:                     26,
-    class_no_param_action:               27,
-    two_params_action:                   28,
-    class_two_params_action:             29,
-    two_params_action_one_default:       30,
-    class_two_params_action_one_default: 31
-  }.freeze
 
   # This method is executed in case you perform instance action.
   # It's not necessary to mark this method with @runnable tag.
