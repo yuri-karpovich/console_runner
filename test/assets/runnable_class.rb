@@ -19,13 +19,18 @@ class RunnableClass
   ACTION_MESSAGE       = 'IN ACTION METHOD'.freeze
   CLASS_ACTION_MESSAGE = 'IN CLASS ACTION METHOD'.freeze
   EXIT_CODES           = {
-    single_param_action:           20,
-    action_with_options:           21,
-    action_not_runnable:           22,
-    class_action_with_param:       23,
-    no_param_action:               24,
-    two_params_action:             25,
-    two_params_action_one_default: 26
+    single_param_action:                 20,
+    class_single_param_action:           21,
+    action_with_options:                 22,
+    class_action_with_options:           23,
+    action_not_runnable:                 24,
+    class_action_not_runnable:           25,
+    no_param_action:                     26,
+    class_no_param_action:               27,
+    two_params_action:                   28,
+    class_two_params_action:             29,
+    two_params_action_one_default:       30,
+    class_two_params_action_one_default: 31
   }.freeze
 
   # This method is executed in case you perform instance action.
@@ -82,9 +87,46 @@ class RunnableClass
   # This is class action you may perform.
   #
   # @runnable This text will be shown in class action --help menu.
-  # @param [String] class_parameter name of parameter
-  def self.class_action_with_param(class_parameter)
-    class_action :class_action_with_param
+  # @param [String] parameter name of parameter
+  def self.class_single_param_action(parameter)
+    class_action :class_single_param_action
+  end
+
+  # @runnable
+  # @param [String] parameter Parameter name
+  # @param [String] another_param another parameter name
+  def self.class_two_params_action(parameter, another_param)
+    puts parameter + another_param
+    class_action :class_two_params_action
+  end
+
+
+  # @runnable
+  # @param [String] parameter Parameter name
+  # @param [String] another_param another parameter name
+  def self.class_two_params_action_one_default(another_param, parameter = 'default')
+    puts parameter + another_param
+    class_action :class_two_params_action_one_default
+  end
+
+  # @runnable This text will be shown in action --help menu.
+  #
+  # @param [String] parameter Parameter name
+  # @param [Hash] options options
+  # @option options [String] :first_option option name
+  # @option options [String] :second_option option name
+  def self.class_action_with_options(parameter, options = {})
+    class_action :class_action_with_options
+  end
+
+  # @param [String] parameter Parameter name
+  def self.class_action_not_runnable(parameter)
+    class_action :class_action_not_runnable
+  end
+
+  # @runnable
+  def self.class_no_param_action
+    class_action :class_no_param_action
   end
 
   private
