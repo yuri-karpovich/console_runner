@@ -25,8 +25,85 @@ Or install it yourself as:
     $ gem install console_runner
 
 ## Usage
+Usage is simple. First of all you need to add `gem 'console_runner'` in your `Gemfile`.
+Then you need to specify `@runnable` tag in your class and method annotations. For example,
+ 
+```ruby
+# This is basic Ruby class with YARD annotation.
+# Nothing special here except @runnable tag. This is a `console_runner` tag that
+# shows that this class can be runnable via bash command line.
+#
+# You can mark any method (class method or instance method) with @runnable tag to show you want the method to be executable.
+# We name class method as *class action* and instance method as *instance action* or just *action*.
+# Instance action requires #initialize method to be executed first. `console_runner` tool invokes #initialize
+# method automatically.
+#
+# @author Yuri Karpovich
+#
+# @runnable This is your "smart" assistant tool.
+#   NOTE: This message will be shown in your tool in --help menu.
+#
+# @since 0.1.0
+class SimpleSiri
 
-TODO: Write usage instructions here
+  def initialize
+    @name = 'Siri'
+    @age = Random.rand 100
+  end
+
+  # Say something
+  #
+  # @runnable
+  # @return [String]
+  # @param [String] what_to_say ask name or age of Siri
+  def say(what_to_say)
+    case what_to_say.downcase
+      when 'name'
+        puts 'My name is ' + @name
+      when 'age'
+        puts "I'm #{@age} years old"
+      else
+        puts "I don't know".green
+    end
+  end
+
+end
+```
+
+Then you can run the tool in your console:
+```bash
+c_run ruby_class.rb say --help
+
+This is your "smart" assistant tool.
+NOTE: This message will be shown in your tool in --help menu.
+  -h, --help               Show this message
+  -w, --what-to-say=<s>    (Ruby class: String) ask name or age of Siri
+```
+
+```bash
+ c_run ruby_class.rb say -w age
+ 
+=======================================================
+Global options:
+     help = false
+INIT: initialize
+INIT options:
+
+Subcommand: say
+Subcommand options:
+     what_to_say = age
+=======================================================
+Start Time: 2017-04-11 21:39:40 +0300
+I'm 78 years old
+Finish Time: 2017-04-11 21:39:40 +0300 (Duration: 0.0 minutes)
+
+```
+
+## ToDo
+- fix help menu for action: action help text should be displayed.
+- add tests for class actions
+- add tests for same methods naming
+- write good readme
 
 ## Development
 
