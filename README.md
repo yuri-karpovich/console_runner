@@ -101,7 +101,6 @@ Finish Time: 2017-04-11 21:39:40 +0300 (Duration: 0.0 minutes)
 
 ## ToDo
 - fix help menu for action: action help text should be displayed.
-- add tests for class actions
 - add tests for same methods naming
 - write good readme
 
