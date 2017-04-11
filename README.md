@@ -51,7 +51,7 @@ The gem is available as open source under the terms of the [MIT License](http://
 [Code Climate]: https://codeclimate.com/github/yuri-karpovich/console_runner
 [Coverage Status]: https://coveralls.io/github/yuri-karpovich/console_runner
 
-[GV img]: https://badge.fury.io/rb/console_runner.png
+[GV img]: https://badge.fury.io/rb/console_runner.svg
 [BS img]: https://travis-ci.org/yuri-karpovich/console_runner.svg?branch=master
 [DS img]: https://gemnasium.com/badges/github.com/yuri-karpovich/console_runner.svg
 [CC img]: https://codeclimate.com/github/yuri-karpovich/console_runner.png

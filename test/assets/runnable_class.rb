@@ -1,4 +1,4 @@
-# This is common Ruby class with YARD annotation.
+# This is basic Ruby class with YARD annotation.
 # Nothing special here except @runnable tag. This is a `console_runner` tag that
 # shows that this class can be runnable via bash command line.
 #

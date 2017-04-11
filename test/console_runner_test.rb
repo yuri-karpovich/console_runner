@@ -6,7 +6,7 @@ require 'assets/runnable_class'
 class ConsoleRunnerTest < Minitest::Test
   EXPECTED_CODES    = RunnableClass::EXIT_CODES
   RUNNABLE_FILE     = 'test/assets/runnable_class.rb'.freeze
-  RUN_COMMAND       = 'ruby exe/c_run.rb'.freeze
+  RUN_COMMAND       = 'ruby exe/c_run'.freeze
   HELP_MENU_TEXT    = '-h, --help'.freeze
   TRY_FOR_HELP_TEXT = 'Try --help for help.'.freeze
   WRONG_ACTION_TEXT = 'You must provide one of available actions: '.freeze
