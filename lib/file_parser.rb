@@ -5,8 +5,10 @@ require 'console_runner_error'
 class FileParser
   RUNNABLE_TAG = :runnable
 
-  # array of #YARD::CodeObjects
-  attr_reader :all_objects
+  attr_reader :clazz,
+              :runnable_methods,
+              :initialize_method,
+              :run_method
 
   # Parse file with #YARD::CLI::Stats
   #
@@ -15,8 +17,17 @@ class FileParser
     raise ConsoleRunnerError "Cannot find file #{file_path}" unless File.exist?(file_path)
     code = YARD::CLI::Stats.new
     code.run(file_path)
-    @all_objects = code.all_objects
+    @all_objects     = code.all_objects
+    runnable_classes = list_classes(:runnable)
+    raise ConsoleRunnerError, 'At least one runnable Class should be specified in file' if runnable_classes.count != 1
+    @clazz             = runnable_classes.first
+    all_methods        = list_methods(:all, clazz)
+    @runnable_methods  = list_methods(:runnable, clazz)
+    @initialize_method = all_methods.find { |m| m.name == :initialize }
+    @run_method        = all_methods.find { |m| m.name == :run }
   end
+
+  private
 
   # List of methods
   # @param [Symbol] scope :all - list all methods, :runnable - list only runnable methods
@@ -93,9 +104,11 @@ YARD::Tags::Library.define_tag 'Console Tool Description', FileParser::RUNNABLE_
 module YARD
   module CLI
     class Stats < Yardoc
-      def print_statistics; end
+      def print_statistics;
+      end
 
-      def print_undocumented_objects; end
+      def print_undocumented_objects;
+      end
     end
   end
 end

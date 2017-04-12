@@ -7,70 +7,56 @@ require 'console_runner/version'
 module ConsoleRunner
   file_from_arg = ARGV.shift
   raise ConsoleRunnerError, 'Specify file to be executed' unless file_from_arg
-  file_path        = File.realpath file_from_arg
-  file_parser      = FileParser.new(file_path)
-  runnable_classes = file_parser.list_classes(:runnable)
-
-  if runnable_classes.count != 1
-    raise ConsoleRunnerError, "One runnable Class should be specified in file.
-Runnable class should be marked with @#{FileParser::RUNNABLE_TAG} tag"
-  end
-
-  clazz             = runnable_classes.first
-  all_methods       = file_parser.list_methods(:all, clazz)
-  runnable_methods  = file_parser.list_methods(:runnable, clazz)
-  initialize_method = all_methods.find { |m| m.name == :initialize }
-  run_method        = all_methods.find { |m| m.name == :run }
-
-
-  cmd            = ARGV[0]
-  action_methods = runnable_methods.select { |m| m.name.to_s == cmd }
-  if action_methods.count > 1
+  file_path   = File.realpath file_from_arg
+  file_parser = FileParser.new(file_path)
+  cmd         = ARGV[0]
+  actions     = file_parser.runnable_methods.select { |m| m.name.to_s == cmd }
+  if actions.count > 1
     raise(
       ConsoleRunnerError,
       "Class and Instance methods have the same name (#{cmd}). Actions names should be unique"
     )
   end
-  action_method = action_methods.first
-  action_method ||= run_method
-  cmd_parser    = TrollopConfigurator.new(runnable_methods, initialize_method)
-  raise ConsoleRunnerError, "Cannot run! You haven't specify any method to run." unless action_method
-  cmd_parser.parse_method action_method
+  action      = actions.first
+  action      ||= file_parser.run_method
+  trol_config = TrollopConfigurator.new(file_parser)
+  raise ConsoleRunnerError, "Cannot run! You haven't specify any method to run." unless action
+  trol_config.parse_method action
 
 
   puts '======================================================='
   puts 'Global options:'
-  puts cmd_parser.global_opts.map { |k, v| "     #{k} = #{v}" }.join("\n")
-  if initialize_method
-    puts "INIT: #{initialize_method.name}"
+  puts trol_config.global_opts.map { |k, v| "     #{k} = #{v}" }.join("\n")
+  if file_parser.initialize_method
+    puts "INIT: #{file_parser.initialize_method.name}"
     puts 'INIT options:'
-    puts cmd_parser.init_method.cmd_opts.map { |k, v| "     #{k} = #{v}" }.join("\n")
+    puts trol_config.init_method.cmd_opts.map { |k, v| "     #{k} = #{v}" }.join("\n")
   end
-  puts "Subcommand: #{action_method.name}"
+  puts "Subcommand: #{action.name}"
   puts 'Subcommand options:'
-  puts cmd_parser.method.cmd_opts.map { |k, v| "     #{k} = #{v}" }.join("\n")
+  puts trol_config.method.cmd_opts.map { |k, v| "     #{k} = #{v}" }.join("\n")
   puts "Remaining arguments: #{ARGV.inspect}" if ARGV != []
   puts '======================================================='
 
 
   Runner.run {
     require file_path
-    class_full_name = clazz.title
+    class_full_name = file_parser.clazz.title
     raise ConsoleRunnerError, "#{class_full_name} is not defined" unless Module.const_defined?(class_full_name)
     klass_obj     = Module.const_get(class_full_name)
-    method_type   = action_method.scope
-    method_params = cmd_parser.method.params_array
+    method_type   = action.scope
+    method_params = trol_config.method.params_array
 
     case method_type
       when :class
-        klass_obj.send(action_method.name, *method_params)
+        klass_obj.send(action.name, *method_params)
       when :instance
-        init_method = cmd_parser.init_method
+        init_method = trol_config.init_method
         init_params = []
         init_params = init_method.params_array if init_method
         # TODO catch errors
         obj         = klass_obj.new(*init_params)
-        obj.send(action_method.name, *method_params)
+        obj.send(action.name, *method_params)
       else
         raise ConsoleRunnerError, "Unknown method type: #{method_type}"
     end

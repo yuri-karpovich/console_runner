@@ -22,7 +22,7 @@ class ConsoleRunnerTest < BaseTestClass
     result = run_runner :no_param_action, '', 'test/assets/some_runnable_classes.rb'
     assert_equal 1, result[:exit_code]
     assert_match(
-      'One runnable Class should be specified in file. (ConsoleRunnerError)',
+      'At least one runnable Class should be specified in file (ConsoleRunnerError)',
       result[:err].join
     )
   end

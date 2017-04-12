@@ -17,14 +17,11 @@ class TrollopConfigurator
     'Array(Boolean)' => :booleans
   }.freeze
 
-  def initialize(file_parser)
-
-
-  end
-
   # Generate tool help menu.
   # IMPORTANT! Should be executed before ARGV.shift
-  def initialize(runnable_methods, init_method = nil)
+  def initialize(file_parser)
+    runnable_methods = file_parser.runnable_methods
+    init_method = file_parser.initialize_method
     clazz        = runnable_methods.first.parent
     sub_commands = runnable_methods.map { |m| m.name.to_s }
     @parser      = Trollop::Parser.new
@@ -32,7 +29,7 @@ class TrollopConfigurator
     @parser.stop_on sub_commands
 
     if init_method
-      @init_method = MethodParser.create init_method
+      @init_method = MethodParser.new init_method
       @init_method.param_tags.each do |tag|
         tag_name = tag.name
         tag_text = tag.text
@@ -73,7 +70,7 @@ class TrollopConfigurator
   # Parse method and configure #Trollop
   def parse_method(method)
     ARGV.shift
-    @method            = MethodParser.create method
+    @method            = MethodParser.new method
     method_params_tags = @method.param_tags
 
     method_params_tags.each do |tag|
