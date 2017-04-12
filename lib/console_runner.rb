@@ -1,13 +1,13 @@
+require 'file_parser'
+require 'cmd_parser'
+require 'runner'
+require 'console_runner/version'
+
+
 module ConsoleRunner
-
-  require 'file_parser'
-  require 'cmd_parser'
-  require 'runner'
-
   file_from_arg = ARGV.shift
   raise ConsoleRunnerError, 'Specify file to be executed' unless file_from_arg
-  file_path ||= File.realpath file_from_arg
-  raise ConsoleRunnerError, "File doesn't exist: #{file_path}" unless File.exist? file_path
+  file_path   = File.realpath file_from_arg
   file_parser = FileParser.new(file_path)
 
 
@@ -59,7 +59,9 @@ Runnable class should be marked with @#{FileParser::RUNNABLE_TAG} tag"
       when :class
         klass_obj.send(action_method.name, *method_params)
       when :instance
-        init_params = cmd_parser.init_method.params_array
+        init_method = cmd_parser.init_method
+        init_params = []
+        init_params = init_method.params_array if init_method
         # TODO catch errors
         obj         = klass_obj.new(*init_params)
         obj.send(action_method.name, *method_params)

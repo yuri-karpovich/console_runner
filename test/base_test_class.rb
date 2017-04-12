@@ -16,17 +16,23 @@ class BaseTestClass < Minitest::Test
 
   private
 
-  def assert_code(action_key, params_string)
-    result = run_runner action_key, params_string
+  def assert_code(action_key, params_string, runnable_file = RUNNABLE_FILE)
+    params = [action_key, params_string]
+    params << runnable_file if runnable_file
+    result = run_runner(*params)
     assert_equal EXPECTED_CODES[action_key], result[:exit_code]
     result
   end
 
-  def run_runner(action_key, params_string)
-    puts "STARTING #{action_key} with #{params_string}" if DEBUG
+  def run_runner(action_key, params_string, runnable_file = RUNNABLE_FILE)
+    if DEBUG
+      puts "FILE: #{runnable_file}"
+      puts "ACTION: #{action_key} with #{params_string}"
+      puts "PARAMS: #{params_string}"
+    end
     result = { out: [], err: [], exit_code: nil }
     Open3.popen3(
-      "#{RUN_COMMAND} #{RUNNABLE_FILE} #{action_key} #{params_string}"
+      "#{RUN_COMMAND} #{runnable_file} #{action_key} #{params_string}"
     ) do |stdin, stdout, stderr, wait_thr|
       stdout.each_line do |line|
         result[:out] << line

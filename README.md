@@ -131,4 +131,4 @@ The gem is available as open source under the terms of the [MIT License](http://
 [BS img]: https://travis-ci.org/yuri-karpovich/console_runner.svg?branch=master
 [DS img]: https://gemnasium.com/badges/github.com/yuri-karpovich/console_runner.svg
 [CC img]: https://codeclimate.com/github/yuri-karpovich/console_runner.png
-[CS img]: https://coveralls.io/repos/github/yuri-karpovich/console_runner/badge.svg
+[CS img]: https://coveralls.io/repos/github/yuri-karpovich/console_runner/badge.svg?branch=master

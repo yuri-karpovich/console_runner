@@ -43,7 +43,6 @@ class RunnableClass
     action :two_params_action
   end
 
-
   # @runnable
   # @param [String] parameter Parameter name
   # @param [String] another_param another parameter name

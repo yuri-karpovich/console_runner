@@ -11,6 +11,7 @@ module ExitCodes
     two_params_action:                   28,
     class_two_params_action:             29,
     two_params_action_one_default:       30,
-    class_two_params_action_one_default: 31
+    class_two_params_action_one_default: 31,
+    action_without_init:                 32
   }.freeze
 end

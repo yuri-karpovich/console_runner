@@ -1,6 +1,6 @@
 module Runner
 
-  def self.run &block
+  def self.run
     start_time = Time.now
     puts "Start Time: #{start_time}"
     Thread.current[:id] = 'main'
