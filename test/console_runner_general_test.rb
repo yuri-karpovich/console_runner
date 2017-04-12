@@ -31,4 +31,13 @@ class ConsoleRunnerTest < BaseTestClass
     assert_code :action_without_init, '', 'test/assets/runnable_class_wo_init.rb'
   end
 
+  def test_actions_with_same_names
+    result = run_runner :same_name_action, ''
+    assert_equal 1, result[:exit_code]
+    assert_match(
+      'Class and Instance methods have the same name',
+      result[:err].join
+    )
+  end
+
 end

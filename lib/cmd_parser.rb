@@ -26,9 +26,14 @@ class CmdParser
 
     if init_method
       @init_method = MethodParser.new init_method
-      same_methods = @init_method.param_tags_names & @init_method.option_tags_names
-      raise "You have the same name for @param and @option attribute(s): #{same_methods.join(', ')}.
-Use different names to `console_runner` be able to run #{@init_method.name} method." if same_methods.count > 0
+      same_params  = @init_method.param_tags_names & @init_method.option_tags_names
+      if same_params.count > 0
+        raise(
+          ConsoleRunnerError,
+          "You have the same name for @param and @option attribute(s): #{same_params.join(', ')}.
+Use different names to `console_runner` be able to run #{@init_method.name} method."
+        )
+      end
 
 
       @init_method.param_tags.each do |tag|
@@ -57,7 +62,7 @@ Use different names to `console_runner` be able to run #{@init_method.name} meth
       begin
         @parser.parse ARGV
       rescue Trollop::CommandlineError => e
-        raise "You must provide one of available actions: #{sub_commands.join ', '}" unless sub_commands.include?(ARGV[0])
+        raise ConsoleRunnerError, "You must provide one of available actions: #{sub_commands.join ', '}" unless sub_commands.include?(ARGV[0])
         raise e
       end
     end
@@ -71,10 +76,15 @@ Use different names to `console_runner` be able to run #{@init_method.name} meth
   # Parse method and configure #Trollop
   def parse_method(method)
     ARGV.shift
-    @method      = MethodParser.new method
-    same_methods = @method.param_tags_names & @method.option_tags_names
-    raise "You have the same name for @param and @option attribute(s): #{same_methods.join(', ')}.
-Use different names to `console_runner` be able to run #{@method.name} method." if same_methods.count > 0
+    @method     = MethodParser.new method
+    same_params = @method.param_tags_names & @method.option_tags_names
+    if same_params.count > 0
+      raise(
+        ConsoleRunnerError,
+        "You have the same name for @param and @option attribute(s): #{same_params.join(', ')}.
+Use different names to `console_runner` be able to run #{@method.name} method."
+      )
+    end
     method_params_tags = @method.param_tags
 
     method_params_tags.each do |tag|
@@ -113,14 +123,14 @@ Use different names to `console_runner` be able to run #{@method.name} method." 
     method_params_tags.select { |t| t.tag_name == 'param' }.map(&:name).each do |required_param|
       next if @method.options_group? required_param
       unless @method.cmd_opts[required_param.to_sym]
-        raise "You must specify required parameter: #{required_param}"
+        raise ConsoleRunnerError, "You must specify required parameter: #{required_param}"
       end
     end
   end
 
   def self.parse_type(yard_type)
     result = TYPES_MAPPINGS[yard_type]
-    raise "Unsupported YARD type: #{yard_type}" unless result
+    raise ConsoleRunnerError, "Unsupported YARD type: #{yard_type}" unless result
     result
   end
 

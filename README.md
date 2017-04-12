@@ -100,8 +100,7 @@ Finish Time: 2017-04-11 21:39:40 +0300 (Duration: 0.0 minutes)
 ```
 
 ## ToDo
-- fix help menu for action: action help text should be displayed.
-- add tests for same methods naming
+- fix help menu for action: action help text should be displayed, list of available actions should be displayed
 - write good readme
 
 ## Development
@@ -114,11 +113,9 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/yuri-karpovich/console_runner.
 
-
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
 
 [Gem Version]: https://rubygems.org/gems/console_runner
 [Build Status]: https://travis-ci.org/yuri-karpovich/console_runner

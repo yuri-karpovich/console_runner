@@ -76,4 +76,13 @@ class ClassActionTest < BaseTestClass
     assert_match 'You must specify required parameter: parameter', result[:err].join
   end
 
+  def test_same_name_param_option
+    result = run_runner :class_same_param_name_action, '-p name --second-option option2'
+    assert_equal 1, result[:exit_code]
+    assert_match(
+      'You have the same name for @param and @option attribute(s): parameter. (ConsoleRunnerError)',
+      result[:err].join
+    )
+  end
+
 end

@@ -5,12 +5,12 @@ require 'console_runner_error'
 class FileParser
   RUNNABLE_TAG = :runnable
 
+  # array of #YARD::CodeObjects
   attr_reader :all_objects
 
   # Parse file with #YARD::CLI::Stats
   #
   # @param [String] file_path path to the file to be parsed
-  # @return[Array(YARD::CodeObjects)] array of #YARD::CodeObjects classes
   def initialize(file_path)
     raise ConsoleRunnerError "Cannot find file #{file_path}" unless File.exist?(file_path)
     code = YARD::CLI::Stats.new

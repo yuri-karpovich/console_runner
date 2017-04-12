@@ -116,6 +116,37 @@ class RunnableClass
     class_action :class_no_param_action
   end
 
+
+  # @runnable
+  def same_name_action
+    action :same_name_action
+  end
+
+  # @runnable
+  def self.same_name_action
+    class_action :class_same_name_action
+  end
+
+  # @runnable
+  #
+  # @param [String] parameter Parameter name
+  # @param [Hash] options options
+  # @option options [String] :first_option option name
+  # @option options [String] :parameter parameter name
+  def same_param_name_action(parameter, options = {})
+    action :same_param_name_action
+  end
+
+  # @runnable
+  #
+  # @param [String] parameter Parameter name
+  # @param [Hash] options options
+  # @option options [String] :first_option option name
+  # @option options [String] :parameter parameter name
+  def self.class_same_param_name_action(parameter, options = {})
+    class_action :class_same_param_name_action
+  end
+
   private
 
   def action(action_key)

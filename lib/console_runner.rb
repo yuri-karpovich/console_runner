@@ -24,8 +24,15 @@ Runnable class should be marked with @#{FileParser::RUNNABLE_TAG} tag"
   run_method        = all_methods.find { |m| m.name == :run }
 
 
-  cmd           = ARGV[0]
-  action_method = runnable_methods.find { |m| m.name.to_s == cmd } # get sub-command
+  cmd            = ARGV[0]
+  action_methods = runnable_methods.select { |m| m.name.to_s == cmd }
+  if action_methods.count > 1
+    raise(
+      ConsoleRunnerError,
+      "Class and Instance methods have the same name (#{cmd}). Action name should be unique"
+    )
+  end
+  action_method = action_methods.first
   action_method ||= run_method
   cmd_parser    = CmdParser.new(runnable_methods, initialize_method)
   raise ConsoleRunnerError, "Cannot run! You haven't specify any method to run." unless action_method
