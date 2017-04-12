@@ -5,8 +5,46 @@
 [![Code Climate][CC img]][Code Climate]
 [![Coverage Status][CS img]][Coverage Status]
 
-This gem provides you an ability to run any Ruby method from command-line (no any code modifications required!!!).
+This gem provides you an ability to run any Ruby method from command-line. No special code modifications required!.
+`console_runner` is a smart mix of [YARD](http://yardoc.org/) and [Trollop](http://manageiq.github.io/trollop/) gems. 
+> 1. it parses [YARD](http://yardoc.org/) annotations of classes and methods to 'understand' your code
+> 2. it generates friendly unix-like help menu for your tool (using [Trollop](http://manageiq.github.io/trollop/) gem)
+> 3. it parses command-line input and run your Ruby code in a proper way 
+
+Just 4 simple steps to make your code runnable from terminal:
+1. Just add `@runnable` tag in 
+
 One thing you need to do is to add an [YARD](http://yardoc.org/) tag annotation `@runnable`.
+
+## Usage
+`console_runner` extends [YARD](http://yardoc.org/) with a new tag: `@runnable`. You need to set this tag in a Class and Method annotation. After that it will be possible to call this method from command-line.
+Usage instructions are as simple as one, two, three:
+1. Add `@runnable` tag
+2. Now you can run your tool from terminal by `c_run /path/to/class.rb_file` command
+3. PROFIT! (: 
+
+### Example
+1. Install `console_runner` gem
+2. Put some code to `/home/user/project/my_class.rb`
+```ruby
+# @runnable
+class MyClass
+
+    # @runnable
+    def say_hello
+      puts 'Hello!'
+    end
+    
+end
+```
+3. Run terminal command to run `say_hello` method
+```bash
+c_run /home/user/project/my_class.rb say_hello
+
+-> Hello!
+```
+
+Read FAQ for more examples.
 
 ## Installation
 
@@ -24,84 +62,40 @@ Or install it yourself as:
 
     $ gem install console_runner
 
-## Usage
-Usage is simple. First of all you need to add `gem 'console_runner'` in your `Gemfile`.
-Then you need to specify `@runnable` tag in your class and method annotations. For example,
- 
+## FAQ
+##### **Can I add documentation for my tool and customize help page content?**
+Yes. Any text placed after `@runnable` tag will be displayed on the help page. You can add any additional information about how to use your tool there.
+> **Tip**: You can use multi-line text as well
+
+**Example:**
 ```ruby
-# This is basic Ruby class with YARD annotation.
-# Nothing special here except @runnable tag. This is a `console_runner` tag that
-# shows that this class can be runnable via bash command line.
-#
-# You can mark any method (class method or instance method) with @runnable tag to show you want the method to be executable.
-# We name class method as *class action* and instance method as *instance action* or just *action*.
-# Instance action requires #initialize method to be executed first. `console_runner` tool invokes #initialize
-# method automatically.
-#
-# @author Yuri Karpovich
-#
-# @runnable This is your "smart" assistant tool.
-#   NOTE: This message will be shown in your tool in --help menu.
-#
-# @since 0.1.0
-class SimpleSiri
+# @runnable This tool can talk to you. Run it when you are lonely.
+class MyClass
 
-  def initialize
-    @name = 'Siri'
-    @age = Random.rand 100
-  end
-
-  # Say something
-  #
-  # @runnable
-  # @return [String]
-  # @param [String] what_to_say ask name or age of Siri
-  def say(what_to_say)
-    case what_to_say.downcase
-      when 'name'
-        puts 'My name is ' + @name
-      when 'age'
-        puts "I'm #{@age} years old"
-      else
-        puts "I don't know".green
+    def initialize
+      @hello_msg = 'Hello!' 
+      @bye_msg = 'Good Bye!' 
     end
-  end
-
+    
+    # @runnable Say 'Hello' to you.
+    def say_hello
+      puts @hello_msg
+    end
+    
+    # @runnable Say 'Good Bye' to you.
+    def say_bye
+      puts @bye_msg
+    end
+    
 end
 ```
 
-Then you can run the tool in your console:
 ```bash
-c_run ruby_class.rb say --help
-
-This is your "smart" assistant tool.
-NOTE: This message will be shown in your tool in --help menu.
-  -h, --help               Show this message
-  -w, --what-to-say=<s>    (Ruby class: String) ask name or age of Siri
-```
-
-```bash
- c_run ruby_class.rb say -w age
- 
-=======================================================
-Global options:
-     help = false
-INIT: initialize
-INIT options:
-
-Subcommand: say
-Subcommand options:
-     what_to_say = age
-=======================================================
-Start Time: 2017-04-11 21:39:40 +0300
-I'm 78 years old
-Finish Time: 2017-04-11 21:39:40 +0300 (Duration: 0.0 minutes)
-
+TODO example
 ```
 
 ## ToDo
 - fix help menu for action: action help text should be displayed, list of available actions should be displayed
-- write good readme
 
 ## Development
 

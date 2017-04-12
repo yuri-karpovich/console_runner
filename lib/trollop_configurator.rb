@@ -2,7 +2,7 @@ require 'trollop'
 require 'method_parser'
 
 # Parses command line and configure #Trollop
-class CmdParser
+class TrollopConfigurator
   attr_reader :global_opts, :method, :init_method
   TYPES_MAPPINGS = {
     'String'         => :string,
@@ -16,8 +16,15 @@ class CmdParser
     'Array(Float)'   => :floats,
     'Array(Boolean)' => :booleans
   }.freeze
-  # Should be executed before ARGV.shift
-  def initialize(runnable_methods, init_method= nil)
+
+  def initialize(file_parser)
+
+
+  end
+
+  # Generate tool help menu.
+  # IMPORTANT! Should be executed before ARGV.shift
+  def initialize(runnable_methods, init_method = nil)
     clazz        = runnable_methods.first.parent
     sub_commands = runnable_methods.map { |m| m.name.to_s }
     @parser      = Trollop::Parser.new
@@ -25,17 +32,7 @@ class CmdParser
     @parser.stop_on sub_commands
 
     if init_method
-      @init_method = MethodParser.new init_method
-      same_params  = @init_method.param_tags_names & @init_method.option_tags_names
-      if same_params.count > 0
-        raise(
-          ConsoleRunnerError,
-          "You have the same name for @param and @option attribute(s): #{same_params.join(', ')}.
-Use different names to `console_runner` be able to run #{@init_method.name} method."
-        )
-      end
-
-
+      @init_method = MethodParser.create init_method
       @init_method.param_tags.each do |tag|
         tag_name = tag.name
         tag_text = tag.text
@@ -47,13 +44,13 @@ Use different names to `console_runner` be able to run #{@init_method.name} meth
               option_name = option.pair.name.delete(':')
               option_text = option.pair.text
               option_type = option.pair.type
-              @parser.opt(option_name.to_sym, "(Ruby class: #{option_type}) " + option_text.to_s, type: CmdParser.parse_type(option_type))
+              @parser.opt(option_name.to_sym, "(Ruby class: #{option_type}) " + option_text.to_s, type: TrollopConfigurator.parse_type(option_type))
             end
           else
-            @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: CmdParser.parse_type(tag_type))
+            @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: TrollopConfigurator.parse_type(tag_type))
           end
         else
-          @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: CmdParser.parse_type(tag_type))
+          @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: TrollopConfigurator.parse_type(tag_type))
         end
       end
     end
@@ -76,15 +73,7 @@ Use different names to `console_runner` be able to run #{@init_method.name} meth
   # Parse method and configure #Trollop
   def parse_method(method)
     ARGV.shift
-    @method     = MethodParser.new method
-    same_params = @method.param_tags_names & @method.option_tags_names
-    if same_params.count > 0
-      raise(
-        ConsoleRunnerError,
-        "You have the same name for @param and @option attribute(s): #{same_params.join(', ')}.
-Use different names to `console_runner` be able to run #{@method.name} method."
-      )
-    end
+    @method            = MethodParser.create method
     method_params_tags = @method.param_tags
 
     method_params_tags.each do |tag|
@@ -98,13 +87,13 @@ Use different names to `console_runner` be able to run #{@method.name} method."
             option_name = option.pair.name.delete(':')
             option_text = option.pair.text
             option_type = option.pair.type
-            @parser.opt(option_name.to_sym, "(Ruby class: #{option_type}) " + option_text.to_s, type: CmdParser.parse_type(option_type))
+            @parser.opt(option_name.to_sym, "(Ruby class: #{option_type}) " + option_text.to_s, type: TrollopConfigurator.parse_type(option_type))
           end
         else
-          @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: CmdParser.parse_type(tag_type))
+          @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: TrollopConfigurator.parse_type(tag_type))
         end
       else
-        @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: CmdParser.parse_type(tag_type))
+        @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: TrollopConfigurator.parse_type(tag_type))
       end
     end
     cmd_opts         = Trollop::with_standard_exception_handling @parser do

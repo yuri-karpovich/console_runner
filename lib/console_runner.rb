@@ -1,17 +1,16 @@
 require 'file_parser'
-require 'cmd_parser'
+require 'trollop_configurator'
 require 'runner'
 require 'console_runner/version'
 
-
+# console_runner logic is here
 module ConsoleRunner
   file_from_arg = ARGV.shift
   raise ConsoleRunnerError, 'Specify file to be executed' unless file_from_arg
-  file_path   = File.realpath file_from_arg
-  file_parser = FileParser.new(file_path)
-
-
+  file_path        = File.realpath file_from_arg
+  file_parser      = FileParser.new(file_path)
   runnable_classes = file_parser.list_classes(:runnable)
+
   if runnable_classes.count != 1
     raise ConsoleRunnerError, "One runnable Class should be specified in file.
 Runnable class should be marked with @#{FileParser::RUNNABLE_TAG} tag"
@@ -29,12 +28,12 @@ Runnable class should be marked with @#{FileParser::RUNNABLE_TAG} tag"
   if action_methods.count > 1
     raise(
       ConsoleRunnerError,
-      "Class and Instance methods have the same name (#{cmd}). Action name should be unique"
+      "Class and Instance methods have the same name (#{cmd}). Actions names should be unique"
     )
   end
   action_method = action_methods.first
   action_method ||= run_method
-  cmd_parser    = CmdParser.new(runnable_methods, initialize_method)
+  cmd_parser    = TrollopConfigurator.new(runnable_methods, initialize_method)
   raise ConsoleRunnerError, "Cannot run! You haven't specify any method to run." unless action_method
   cmd_parser.parse_method action_method
 

@@ -2,8 +2,8 @@
 class MethodParser
   attr_reader :method,
               :name,
-              :param_tags,    # All method parameters tags
-              :option_tags    # Only options tags
+              :param_tags, # All method parameters tags
+              :option_tags # Only options tags
 
   attr_accessor :cmd_opts
 
@@ -15,6 +15,19 @@ class MethodParser
     @param_tags  = FileParser.select_param_tags @method
     @option_tags = FileParser.select_option_tags @method
     @cmd_opts    = nil
+  end
+
+  def self.create(method)
+    m           = new(method)
+    same_params = m.param_tags_names & m.option_tags_names
+    if same_params.count > 0
+      raise(
+        ConsoleRunnerError,
+        "You have the same name for @param and @option attribute(s): #{same_params.join(', ')}.
+Use different names to `console_runner` be able to run #{m.name} method."
+      )
+    end
+    m
   end
 
   # Prepare
