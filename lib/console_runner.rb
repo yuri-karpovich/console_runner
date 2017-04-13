@@ -25,7 +25,6 @@ module ConsoleRunner
 
   puts '======================================================='
   puts 'Global options:'
-  puts trol_config.global_opts.map { |k, v| "     #{k} = #{v}" }.join("\n")
   if file_parser.initialize_method
     puts "INIT: #{file_parser.initialize_method.name}"
     puts 'INIT options:'

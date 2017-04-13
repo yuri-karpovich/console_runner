@@ -10,7 +10,8 @@ class BaseTestClass < Minitest::Test
   EXPECTED_CODES    = EXIT_CODES
   RUNNABLE_FILE     = 'test/assets/runnable_class.rb'.freeze
   RUN_COMMAND       = 'ruby exe/c_run'.freeze
-  HELP_MENU_TEXT    = '-h, --help'.freeze
+  # HELP_MENU_TEXT    = '-h, --help'.freeze
+  HELP_MENU_TEXT    = 'Here you can specify you tool description. This message will be shown in you'.freeze
   TRY_FOR_HELP_TEXT = 'Try --help for help.'.freeze
   WRONG_ACTION_TEXT = 'You must provide one of available actions: '.freeze
 
@@ -47,6 +48,5 @@ class BaseTestClass < Minitest::Test
     end
     result
   end
-
 
 end

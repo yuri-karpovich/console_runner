@@ -63,7 +63,7 @@ Or install it yourself as:
     $ gem install console_runner
 
 ## FAQ
-##### **Can I add documentation for my tool and customize help page content?**
+#### **Can I add documentation for my tool and customize help page content?**
 Yes. Any text placed after `@runnable` tag will be displayed on the help page. You can add any additional information about how to use your tool there.
 > **Tip**: You can use multi-line text as well
 
