@@ -20,9 +20,7 @@ module ConsoleRunner
   action      = actions.first
   action      ||= file_parser.run_method
   trol_config = CommandLineParser.new(file_parser)
-  trol_config.run
-  raise ConsoleRunnerError, "Cannot run! You haven't specify any method to run." unless action
-  trol_config.parse_method action
+  trol_config.run(action)
 
 
   puts '======================================================='
@@ -63,12 +61,5 @@ module ConsoleRunner
     end
 
   }
-
-
-# raise ConsoleRunnerError, "#{clazz.name}#initialize method should be specified" unless initialize_method
-#
-# raise ConsoleRunnerError, "At least one method should be marked with @#{FileParser::RUNNABLE_TAG.to_s} tag.
-# Also you may specify #run method and it will be executed by default.
-# #run method don't need any code annotations as well." if runnable_methods.count == 0 unless run_method
 
 end

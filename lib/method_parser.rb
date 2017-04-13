@@ -15,14 +15,13 @@ class MethodParser
     @param_tags  = FileParser.select_param_tags @method
     @option_tags = FileParser.select_option_tags @method
     @cmd_opts    = nil
-    same_params = param_tags_names & option_tags_names
-    if same_params.count > 0
-      raise(
-        ConsoleRunnerError,
-        "You have the same name for @param and @option attribute(s): #{same_params.join(', ')}.
+    same_params  = param_tags_names & option_tags_names
+    return if same_params.count.zero?
+    raise(
+      ConsoleRunnerError,
+      "You have the same name for @param and @option attribute(s): #{same_params.join(', ')}.
 Use different names to `console_runner` be able to run #{@name} method."
-      )
-    end
+    )
   end
 
   # Prepare

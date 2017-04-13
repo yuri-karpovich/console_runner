@@ -27,32 +27,8 @@ class CommandLineParser
     @parser.stop_on @sub_commands
   end
 
-  def run
-    init_method = @file_parser.initialize_method
-    if init_method
-      @init_method = MethodParser.new init_method
-      @init_method.param_tags.each do |tag|
-        tag_name = tag.name
-        tag_text = tag.text
-        tag_type = tag.type
-        if tag_type == "Hash"
-          options = option_tags.select { |t| t.name == tag.name }
-          if options.count > 0
-            options.each do |option|
-              option_name = option.pair.name.delete(':')
-              option_text = option.pair.text
-              option_type = option.pair.type
-              @parser.opt(option_name.to_sym, "(Ruby class: #{option_type}) " + option_text.to_s, type: CommandLineParser.parse_type(option_type))
-            end
-          else
-            @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: CommandLineParser.parse_type(tag_type))
-          end
-        else
-          @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: CommandLineParser.parse_type(tag_type))
-        end
-      end
-    end
-
+  def run(action)
+    @init_method = method_parse @file_parser.initialize_method
     @global_opts = Trollop::with_standard_exception_handling(@parser) do
       begin
         @parser.parse ARGV
@@ -61,25 +37,44 @@ class CommandLineParser
         raise e
       end
     end
-
     if @init_method
       given_attrs           = @global_opts.keys.select { |k| k.to_s.include? '_given' }.map { |k| k.to_s.gsub('_given', '').to_sym }
       @init_method.cmd_opts = @global_opts.select { |k, _| given_attrs.include? k }
     end
+    raise ConsoleRunnerError, "Cannot run! You haven't specify any method to run." unless action
+
+    ARGV.shift
+    @method          = method_parse action
+    cmd_opts         = Trollop::with_standard_exception_handling @parser do
+      unless @method.param_tags.count.zero?
+        raise Trollop::HelpNeeded if ARGV.empty?
+      end
+      # show help screen
+      @parser.parse ARGV
+    end
+    given_attrs      = cmd_opts.keys.select { |k| k.to_s.include? '_given' }.map { |k| k.to_s.gsub('_given', '').to_sym }
+    @method.cmd_opts = cmd_opts.select { |k, _| given_attrs.include? k }
+    @method.default_params.each do |k, v|
+      @method.cmd_opts[k.to_sym] ||= v
+    end
+
+    @method.param_tags.select { |t| t.tag_name == 'param' }.map(&:name).each do |required_param|
+      next if @method.options_group? required_param
+      unless @method.cmd_opts[required_param.to_sym]
+        raise ConsoleRunnerError, "You must specify required parameter: #{required_param}"
+      end
+    end
   end
 
-  # Parse method and configure #Trollop
-  def parse_method(method)
-    ARGV.shift
-    @method            = MethodParser.new method
-    method_params_tags = @method.param_tags
-
-    method_params_tags.each do |tag|
+  def method_parse(yard_method)
+    return nil unless yard_method
+    method = MethodParser.new yard_method
+    method.param_tags.each do |tag|
       tag_name = tag.name
       tag_text = tag.text
       tag_type = tag.type
       if tag_type == "Hash"
-        options = @method.option_tags.select { |t| t.name == tag.name }
+        options = method.option_tags.select { |t| t.name == tag.name }
         if options.count > 0
           options.each do |option|
             option_name = option.pair.name.delete(':')
@@ -94,25 +89,7 @@ class CommandLineParser
         @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: CommandLineParser.parse_type(tag_type))
       end
     end
-    cmd_opts         = Trollop::with_standard_exception_handling @parser do
-      unless method_params_tags.count.zero?
-        raise Trollop::HelpNeeded if ARGV.empty?
-      end
-      # show help screen
-      @parser.parse ARGV
-    end
-    given_attrs      = cmd_opts.keys.select { |k| k.to_s.include? '_given' }.map { |k| k.to_s.gsub('_given', '').to_sym }
-    @method.cmd_opts = cmd_opts.select { |k, _| given_attrs.include? k }
-    @method.default_params.each do |k, v|
-      @method.cmd_opts[k.to_sym] ||= v
-    end
-
-    method_params_tags.select { |t| t.tag_name == 'param' }.map(&:name).each do |required_param|
-      next if @method.options_group? required_param
-      unless @method.cmd_opts[required_param.to_sym]
-        raise ConsoleRunnerError, "You must specify required parameter: #{required_param}"
-      end
-    end
+    method
   end
 
   def self.parse_type(yard_type)
