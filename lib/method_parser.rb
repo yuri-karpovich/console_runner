@@ -82,13 +82,10 @@ Use different names to `console_runner` be able to run #{@name} method."
     result
   end
 
-  # Prepare
   def params_array
-    expected_params = @parameters.map(&:first).map.with_index { |p, i| [i, p] }.to_h
     options_groups  = {}
     get_params      = {}
-
-    expected_params.each do |index, name|
+    @parameters.map(&:first).map.with_index { |p, i| [i, p] }.to_h.each do |index, name|
       if options_group?(name)
         options_groups[index] = name
         get_params[index]     = option_as_hash(name)
@@ -96,24 +93,16 @@ Use different names to `console_runner` be able to run #{@name} method."
         get_params[index] = @cmd_opts[name.to_sym]
       end
     end
-    get_params = get_params.to_a.sort_by { |a| a[0] }.reverse
-
+    get_params  = get_params.to_a.sort_by { |a| a[0] }.reverse
     stop_delete = false
     get_params.delete_if do |a|
-      index  = a[0]
-      value  = a[1]
-      result = false
-
-      if options_groups[index]
-        result = value == {}
-      else
-        result = value == nil
-      end
+      index       = a[0]
+      value       = a[1]
+      result      = value.nil?
+      result      = value == {} if options_groups[index]
       stop_delete = true unless result
       next if stop_delete
-      result
     end
-
     get_params.sort_by { |a| a[0] }.map { |a| a[1] }
   end
 

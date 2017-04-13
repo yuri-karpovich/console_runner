@@ -52,7 +52,6 @@ module ConsoleRunner
         init_method = trol_config.init_method
         init_params = []
         init_params = init_method.params_array if init_method
-        # TODO catch errors
         obj         = klass_obj.new(*init_params)
         obj.send(action.name, *method_params)
       else
