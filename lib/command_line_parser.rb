@@ -2,7 +2,7 @@ require 'trollop'
 require 'method_parser'
 
 # Parses command line and configure #Trollop
-class TrollopConfigurator
+class CommandLineParser
   attr_reader :global_opts, :method, :init_method
   TYPES_MAPPINGS = {
     'String'         => :string,
@@ -20,14 +20,15 @@ class TrollopConfigurator
   # Generate tool help menu.
   # IMPORTANT! Should be executed before ARGV.shift
   def initialize(file_parser)
-    runnable_methods = file_parser.runnable_methods
-    init_method = file_parser.initialize_method
-    clazz        = runnable_methods.first.parent
-    sub_commands = runnable_methods.map { |m| m.name.to_s }
-    @parser      = Trollop::Parser.new
-    @parser.banner(FileParser.select_runnable_tags(clazz).map { |t| (t.text + "\n") }.join("\n"))
-    @parser.stop_on sub_commands
+    @file_parser  = file_parser
+    @sub_commands = @file_parser.runnable_methods.map { |m| m.name.to_s }
+    @parser       = Trollop::Parser.new
+    @parser.banner(FileParser.select_runnable_tags(@file_parser.clazz).map { |t| (t.text + "\n") }.join("\n"))
+    @parser.stop_on @sub_commands
+  end
 
+  def run
+    init_method = @file_parser.initialize_method
     if init_method
       @init_method = MethodParser.new init_method
       @init_method.param_tags.each do |tag|
@@ -41,13 +42,13 @@ class TrollopConfigurator
               option_name = option.pair.name.delete(':')
               option_text = option.pair.text
               option_type = option.pair.type
-              @parser.opt(option_name.to_sym, "(Ruby class: #{option_type}) " + option_text.to_s, type: TrollopConfigurator.parse_type(option_type))
+              @parser.opt(option_name.to_sym, "(Ruby class: #{option_type}) " + option_text.to_s, type: CommandLineParser.parse_type(option_type))
             end
           else
-            @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: TrollopConfigurator.parse_type(tag_type))
+            @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: CommandLineParser.parse_type(tag_type))
           end
         else
-          @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: TrollopConfigurator.parse_type(tag_type))
+          @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: CommandLineParser.parse_type(tag_type))
         end
       end
     end
@@ -56,7 +57,7 @@ class TrollopConfigurator
       begin
         @parser.parse ARGV
       rescue Trollop::CommandlineError => e
-        raise ConsoleRunnerError, "You must provide one of available actions: #{sub_commands.join ', '}" unless sub_commands.include?(ARGV[0])
+        raise ConsoleRunnerError, "You must provide one of available actions: #{@sub_commands.join ', '}" unless @sub_commands.include?(ARGV[0])
         raise e
       end
     end
@@ -84,13 +85,13 @@ class TrollopConfigurator
             option_name = option.pair.name.delete(':')
             option_text = option.pair.text
             option_type = option.pair.type
-            @parser.opt(option_name.to_sym, "(Ruby class: #{option_type}) " + option_text.to_s, type: TrollopConfigurator.parse_type(option_type))
+            @parser.opt(option_name.to_sym, "(Ruby class: #{option_type}) " + option_text.to_s, type: CommandLineParser.parse_type(option_type))
           end
         else
-          @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: TrollopConfigurator.parse_type(tag_type))
+          @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: CommandLineParser.parse_type(tag_type))
         end
       else
-        @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: TrollopConfigurator.parse_type(tag_type))
+        @parser.opt(tag_name.to_sym, "(Ruby class: #{tag_type}) " + tag_text.to_s, type: CommandLineParser.parse_type(tag_type))
       end
     end
     cmd_opts         = Trollop::with_standard_exception_handling @parser do

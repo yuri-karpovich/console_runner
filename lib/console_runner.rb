@@ -1,5 +1,5 @@
 require 'file_parser'
-require 'trollop_configurator'
+require 'command_line_parser'
 require 'runner'
 require 'console_runner/version'
 
@@ -19,7 +19,8 @@ module ConsoleRunner
   end
   action      = actions.first
   action      ||= file_parser.run_method
-  trol_config = TrollopConfigurator.new(file_parser)
+  trol_config = CommandLineParser.new(file_parser)
+  trol_config.run
   raise ConsoleRunnerError, "Cannot run! You haven't specify any method to run." unless action
   trol_config.parse_method action
 
