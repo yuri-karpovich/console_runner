@@ -21,7 +21,7 @@ One thing you need to do is to add an [YARD](http://yardoc.org/) tag annotation 
 Usage instructions are as simple as one, two, three:
 1. Add `@runnable` tag
 2. Now you can run your tool from terminal by `c_run /path/to/class.rb_file` command
-3. PROFIT! (: 
+3. PROFIT! 
 
 ### Example
 1. Install `console_runner` gem
