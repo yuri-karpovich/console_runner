@@ -17,24 +17,47 @@ class BaseTestClass < Minitest::Test
 
   private
 
-  def assert_code(action_key, params_string, runnable_file = RUNNABLE_FILE)
-    params = [action_key, params_string]
-    params << runnable_file if runnable_file
-    result = run_runner(*params)
+  def assert_runner(action_key, params_string, options = {})
+    runnable_file = options[:runnable_file]
+    runnable_file ||= RUNNABLE_FILE
+    result        = run_runner(action_key, params_string, runnable_file: runnable_file)
+    if options[:init]
+      assert_match(init_text, result[:out].join)
+    else
+      refute_match(init_text, result[:out].join)
+    end
+    if options[:action]
+      assert_match(action_text(action_key), result[:out].join)
+    else
+      refute_match(action_text(action_key), result[:out].join)
+    end
+    if options[:class_action]
+      assert_match(class_action_text(action_key), result[:out].join)
+    else
+      refute_match(class_action_text(action_key), result[:out].join)
+    end
     assert_equal EXPECTED_CODES[action_key], result[:exit_code]
     result
   end
 
-  def run_runner(action_key, params_string, runnable_file = RUNNABLE_FILE)
-    if DEBUG
-      puts "FILE: #{runnable_file}"
-      puts "ACTION: #{action_key} with #{params_string}"
-      puts "PARAMS: #{params_string}"
-    end
-    result = { out: [], err: [], exit_code: nil }
-    Open3.popen3(
-      "#{RUN_COMMAND} #{runnable_file} #{action_key} #{params_string}"
-    ) do |stdin, stdout, stderr, wait_thr|
+  def action_text(action_key)
+    "IN ACTION METHOD: #{action_key}"
+  end
+
+  def class_action_text(action_key)
+    "IN CLASS ACTION METHOD: #{action_key}"
+  end
+
+  def init_text
+    'IN INITIALIZE METHOD'
+  end
+
+  def run_runner(action_key, params_string, options = {})
+    runnable_file = options[:runnable_file]
+    runnable_file ||= RUNNABLE_FILE
+    command       = "#{RUN_COMMAND} #{runnable_file} #{action_key} #{params_string}"
+    result        = { out: [], err: [], exit_code: nil }
+    Open3.popen3(command) do |_stdin, stdout, stderr, wait_thr|
       stdout.each_line do |line|
         result[:out] << line
         puts line.green if DEBUG
@@ -44,7 +67,10 @@ class BaseTestClass < Minitest::Test
         puts line.red if DEBUG
       end
       result[:exit_code] = wait_thr.value.exitstatus
-      puts "EXIT CODE: #{result[:exit_code]}" if DEBUG
+      if DEBUG
+        puts "#{command}
+EXIT CODE: #{result[:exit_code]}"
+      end
     end
     result
   end
