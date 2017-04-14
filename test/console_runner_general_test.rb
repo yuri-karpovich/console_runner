@@ -6,6 +6,16 @@ class ConsoleRunnerTest < BaseTestClass
     refute_nil ::ConsoleRunner::VERSION
   end
 
+
+  def test_no_any_params
+    result = run_runner '', ''
+    assert_equal 1, result[:exit_code]
+    assert_match WRONG_ACTION_TEXT, result[:err].join
+    refute_match class_action_text(''), result[:out].join
+    refute_match action_text(''), result[:out].join
+    refute_match init_text, result[:out].join
+  end
+
   def test_tool_help_menu
     result = run_runner '-h', ''
     assert_equal 0, result[:exit_code]

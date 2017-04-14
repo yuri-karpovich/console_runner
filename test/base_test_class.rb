@@ -13,7 +13,7 @@ class BaseTestClass < Minitest::Test
   # HELP_MENU_TEXT    = '-h, --help'.freeze
   HELP_MENU_TEXT    = 'Here you can specify you tool description. This message will be shown in you'.freeze
   TRY_FOR_HELP_TEXT = 'Try --help for help.'.freeze
-  WRONG_ACTION_TEXT = 'You must provide one of available actions: '.freeze
+  WRONG_ACTION_TEXT = 'You must provide one of available actions'.freeze
 
   private
 

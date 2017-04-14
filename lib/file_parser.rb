@@ -27,6 +27,14 @@ class FileParser
     @run_method        = all_methods.find { |m| m.name == :run }
   end
 
+  # Select all @runnable tags from of specified object
+  #
+  # @param [YARD::CodeObjects::MethodObject, YARD::CodeObjects::ClassObject] yard_object YARD object
+  # @return [Array(YARD::Tags::Tag)]
+  def self.select_runnable_tags(yard_object)
+    yard_object.tags.select { |t| t.tag_name == RUNNABLE_TAG.to_s }
+  end
+
   private
 
   # List of methods
@@ -70,14 +78,6 @@ class FileParser
       else
         raise ":scope can be :all or #{RUNNABLE_TAG}"
     end
-  end
-
-  # Select all @runnable tags from of specified object
-  #
-  # @param [YARD::CodeObjects::MethodObject, YARD::CodeObjects::ClassObject] yard_object YARD object
-  # @return [Array(YARD::Tags::Tag)]
-  def self.select_runnable_tags(yard_object)
-    yard_object.tags.select { |t| t.tag_name == RUNNABLE_TAG.to_s }
   end
 
   # Select all @option tags from of specified object

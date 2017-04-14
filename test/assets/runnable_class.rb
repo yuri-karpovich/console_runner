@@ -39,7 +39,6 @@ class RunnableClass
   # @param [String] parameter Parameter name
   # @param [String] another_param another parameter name
   def two_params_action(parameter, another_param)
-    puts parameter + another_param
     action :two_params_action
   end
 
@@ -47,7 +46,6 @@ class RunnableClass
   # @param [String] parameter Parameter name
   # @param [String] another_param another parameter name
   def two_params_action_one_default(another_param, parameter = 'default')
-    puts parameter + another_param
     action :two_params_action_one_default
   end
 
@@ -83,7 +81,6 @@ class RunnableClass
   # @param [String] parameter Parameter name
   # @param [String] another_param another parameter name
   def self.class_two_params_action(parameter, another_param)
-    puts parameter + another_param
     class_action :class_two_params_action
   end
 
@@ -92,7 +89,6 @@ class RunnableClass
   # @param [String] parameter Parameter name
   # @param [String] another_param another parameter name
   def self.class_two_params_action_one_default(another_param, parameter = 'default')
-    puts parameter + another_param
     class_action :class_two_params_action_one_default
   end
 
