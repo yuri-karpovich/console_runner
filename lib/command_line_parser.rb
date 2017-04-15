@@ -19,7 +19,6 @@ class CommandLineParser
       ]
     end.to_h
     @parser            = Trollop::Parser.new
-    @parser.opt(:debug, 'Run in debug mode.', type: :flag)
     @parser.stop_on @sub_commands
     @initialize_method = nil
   end
@@ -46,7 +45,7 @@ class CommandLineParser
       action_index = ARGV.index(action)
       scope        = ARGV[0..action_index] if action_index
     end
-    @debug = scope.any? { |a| %w(-d --debug).include? a }
+    @debug = ARGV.any? { |a| %w(-d --debug).include? a }
     return unless scope.any? { |a| %w(-h --help).include? a }
     @parser.banner("\n" + banner)
     Trollop::with_standard_exception_handling(@parser) { raise Trollop::HelpNeeded }
@@ -63,6 +62,7 @@ class CommandLineParser
     raise_on_action_absence @sub_commands
     @initialize_method ||= MethodParser.new(@file_parser.initialize_method) if @file_parser.initialize_method
     @method            = MethodParser.new action
+    @parser.opt(:debug, 'Run in debug mode.', type: :flag)
     [@initialize_method, @method].each do |method|
       next unless method
       method.trollop_opts.each { |a| @parser.opt(*a) }
