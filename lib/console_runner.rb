@@ -4,11 +4,12 @@ require 'console_runner/version'
 
 # console_runner logic is here
 module ConsoleRunner
+  SEPARATOR = '==================================='.freeze
   begin
-    start_time = Time.now
+    start_time     = Time.now
     success_status = true
-    puts "===================================
-    Start Time: #{start_time}".blue
+    puts "#{SEPARATOR}
+Start Time: #{start_time}".blue
 
     file_from_arg = ARGV.shift
     raise ConsoleRunnerError, 'Specify file to be executed' unless file_from_arg
@@ -27,19 +28,16 @@ module ConsoleRunner
     c_line_parser = CommandLineParser.new(file_parser)
     c_line_parser.run(action)
 
-
-    puts '======================================================='
-    puts 'Global options:'
-    if file_parser.initialize_method
-      puts "INIT: #{file_parser.initialize_method.name}"
-      puts 'INIT options:'
-      puts c_line_parser.init_method.cmd_opts.map { |k, v| "     #{k} = #{v}" }.join("\n")
+    debug_message = "#{SEPARATOR}\n"
+    if c_line_parser.initialize_method
+      debug_message += ":initialize method:\n"
+      debug_message += c_line_parser.initialize_method.cmd_opts.map { |k, v| "     #{k} = #{v}" }.join("\n")
     end
-    puts "Subcommand: #{action.name}"
-    puts 'Subcommand options:'
-    puts c_line_parser.method.cmd_opts.map { |k, v| "     #{k} = #{v}" }.join("\n")
-    puts "Remaining arguments: #{ARGV.inspect}" if ARGV != []
-    puts '======================================================='
+    debug_message += "#{action.name} method:\n"
+    debug_message += c_line_parser.method.cmd_opts.map { |k, v| "     #{k} = #{v}" }.join("\n")
+    debug_message +=  "Remaining arguments: #{ARGV.inspect}" if ARGV != []
+    debug_message += SEPARATOR
+    puts debug_message if CommandLineParser.debug?
 
 
     require file_path
@@ -53,7 +51,7 @@ module ConsoleRunner
       when :class
         klass_obj.send(action.name, *method_params)
       when :instance
-        init_method = c_line_parser.init_method
+        init_method = c_line_parser.initialize_method
         init_params = []
         init_params = init_method.params_array if init_method
         obj         = klass_obj.new(*init_params)
@@ -63,13 +61,13 @@ module ConsoleRunner
     end
   rescue => e
     success_status = false
-      raise e
+    raise e
   ensure
     finish_time = Time.now
-    status = success_status ? 'Success'.green : 'Error'.red
+    status      = success_status ? 'Success'.green : 'Error'.red
     puts 'Execution status: '.blue + status
-    puts "===================================
-    Finish Time: #{finish_time} (Duration: #{((finish_time - start_time) / 60).round(2) } minutes)
+    puts "#{SEPARATOR}
+Finish Time: #{finish_time} (Duration: #{((finish_time - start_time) / 60).round(2) } minutes)
 ".blue
   end
 end
