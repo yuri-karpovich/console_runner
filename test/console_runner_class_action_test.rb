@@ -13,9 +13,8 @@ class ClassActionTest < BaseTestClass
   def test_class_action_missed_param
     action_key = :class_single_param_action
     result     = run_runner action_key, ''
-    assert_equal 0, result[:exit_code]
-    assert_match HELP_MENU_TEXT, result[:out].join
-    assert_match '--parameter=<s>', result[:out].join
+    assert_equal 1, result[:exit_code]
+    assert_match 'You must specify required parameter', result[:err].join
     refute_match class_action_text(action_key), result[:out].join
   end
 
@@ -42,8 +41,7 @@ class ClassActionTest < BaseTestClass
   def test_class_action_unknown_param
     action_key = :class_single_param_action
     result     = run_runner action_key, '-p name -u unknown'
-    assert_equal 255, result[:exit_code]
-    assert_match TRY_FOR_HELP_TEXT, result[:err].join
+    assert_equal 1, result[:exit_code]
     assert_match "unknown argument '-u'", result[:err].join
     refute_match class_action_text(action_key), result[:out].join
   end
@@ -52,7 +50,7 @@ class ClassActionTest < BaseTestClass
     action_key = :class_single_param_action
     result     = run_runner action_key, '-p name -h'
     assert_equal 0, result[:exit_code]
-    assert_match HELP_MENU_TEXT, result[:out].join
+    assert_match CLASS_ACTION_HELP, result[:out].join
     assert_match '--parameter=<s>', result[:out].join
     refute_match class_action_text(action_key), result[:out].join
   end
@@ -61,7 +59,7 @@ class ClassActionTest < BaseTestClass
     action_key = :class_single_param_action
     result     = run_runner action_key, '-h'
     assert_equal 0, result[:exit_code]
-    assert_match HELP_MENU_TEXT, result[:out].join
+    assert_match CLASS_ACTION_HELP, result[:out].join
     assert_match '--parameter=<s>', result[:out].join
     refute_match class_action_text(action_key), result[:out].join
   end
@@ -70,7 +68,7 @@ class ClassActionTest < BaseTestClass
     action_key = :class_action_not_runnable
     result     = run_runner action_key, '-p name'
     assert_equal 1, result[:exit_code]
-    assert_match WRONG_ACTION_TEXT, result[:err].join
+    assert_match 'Cannot find any @runnable action', result[:err].join
     refute_match class_action_text(action_key), result[:out].join
   end
 

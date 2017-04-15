@@ -29,7 +29,7 @@ class RunnableClass
 
   # This is instance action you may perform.
   #
-  # @runnable
+  # @runnable This text will be shown in action --help menu.
   # @param [String] parameter Parameter name
   def single_param_action(parameter)
     action :single_param_action

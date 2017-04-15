@@ -2,6 +2,7 @@
 class MethodParser
   attr_reader :method,
               :name,
+              :text,
               :parameters,
               :param_tags, # All method parameters tags
               :option_tags, # Only options tags
@@ -28,6 +29,7 @@ class MethodParser
   def initialize(method)
     @method              = method
     @name                = @method.name
+    @text                = FileParser.select_runnable_tags(@method).map(&:text).join("\n")
     @parameters          = @method.parameters
     @default_values      = default_params
     @param_tags          = FileParser.select_param_tags @method
@@ -83,8 +85,8 @@ Use different names to `console_runner` be able to run #{@name} method."
   end
 
   def params_array
-    options_groups  = {}
-    get_params      = {}
+    options_groups = {}
+    get_params     = {}
     @parameters.map(&:first).map.with_index { |p, i| [i, p] }.to_h.each do |index, name|
       if options_group?(name)
         options_groups[index] = name

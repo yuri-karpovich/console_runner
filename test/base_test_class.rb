@@ -6,12 +6,14 @@ require 'assets/exit_codes'
 class BaseTestClass < Minitest::Test
   include ExitCodes
 
-  DEBUG             = ENV['DEBUG'].to_s == 'true'
+  DEBUG             = ENV['TEST_STDOUT'].to_s == 'true'
   EXPECTED_CODES    = EXIT_CODES
   RUNNABLE_FILE     = 'test/assets/runnable_class.rb'.freeze
   RUN_COMMAND       = 'ruby exe/c_run'.freeze
   # HELP_MENU_TEXT    = '-h, --help'.freeze
   HELP_MENU_TEXT    = 'Here you can specify you tool description. This message will be shown in you'.freeze
+  CLASS_ACTION_HELP = 'This text will be shown in class action --help menu.'.freeze
+  ACTION_HELP       = 'This text will be shown in action --help menu.'.freeze
   TRY_FOR_HELP_TEXT = 'Try --help for help.'.freeze
   WRONG_ACTION_TEXT = 'You must provide one of available actions'.freeze
 
