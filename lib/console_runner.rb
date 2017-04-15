@@ -13,10 +13,12 @@ Start Time: #{start_time}".blue
 
     file_from_arg = ARGV.shift
     raise ConsoleRunnerError, 'Specify file to be executed' unless file_from_arg
-    file_path   = File.realpath file_from_arg
-    file_parser = FileParser.new(file_path)
-    cmd         = ARGV[0]
-    actions     = file_parser.runnable_methods.select { |m| m.name.to_s == cmd }
+    file_path      = File.realpath file_from_arg
+    file_parser    = FileParser.new(file_path)
+    next_arguments = ARGV.dup
+    %w(-d --debug -h --help).each { |a| next_arguments.delete a }
+    cmd     = next_arguments[0]
+    actions = file_parser.runnable_methods.select { |m| m.name.to_s == cmd }
     if actions.count > 1
       raise(
         ConsoleRunnerError,
@@ -28,17 +30,16 @@ Start Time: #{start_time}".blue
     c_line_parser = CommandLineParser.new(file_parser)
     c_line_parser.run(action)
 
-    debug_message = "#{SEPARATOR}\n"
+    debug_message = SEPARATOR
     if c_line_parser.initialize_method
-      debug_message += ":initialize method:\n"
+      debug_message += "\ninitialize method execution\n"
       debug_message += c_line_parser.initialize_method.cmd_opts.map { |k, v| "     #{k} = #{v}" }.join("\n")
     end
-    debug_message += "#{action.name} method:\n"
+    debug_message += "\n#{action.name} method execution\n"
     debug_message += c_line_parser.method.cmd_opts.map { |k, v| "     #{k} = #{v}" }.join("\n")
-    debug_message +=  "Remaining arguments: #{ARGV.inspect}" if ARGV != []
-    debug_message += SEPARATOR
+    debug_message += "\nRemaining arguments: #{ARGV.inspect}" if ARGV != []
+    debug_message += "\n#{SEPARATOR}"
     puts debug_message if CommandLineParser.debug?
-
 
     require file_path
     class_full_name = file_parser.clazz.title

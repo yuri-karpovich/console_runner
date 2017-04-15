@@ -6,7 +6,6 @@ class ConsoleRunnerTest < BaseTestClass
     refute_nil ::ConsoleRunner::VERSION
   end
 
-
   def test_no_any_params
     result = run_runner '', ''
     assert_equal 1, result[:exit_code]
@@ -60,6 +59,17 @@ class ConsoleRunnerTest < BaseTestClass
     refute_match class_action_text(''), result[:out].join
     refute_match action_text(''), result[:out].join
     refute_match init_text, result[:out].join
+  end
+
+  def test_debug_param
+    action = :single_param_action
+    result = run_runner "-d #{action}", '-p name'
+    assert_equal EXIT_CODES[action], result[:exit_code]
+    refute_match class_action_text(action), result[:out].join
+    assert_match action_text(action), result[:out].join
+    assert_match init_text, result[:out].join
+    assert_match 'debug = true', result[:out].join
+    assert_match "#{action} method execution", result[:out].join
   end
 
 end
