@@ -1,7 +1,7 @@
 class ConsoleRunnerError < StandardError
 
-  def backtrace
-    if CommandLineParser.debug?
+  def backtrace(debug = CommandLineParser.debug?)
+    if debug
       super
     else
       @object
