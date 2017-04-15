@@ -4,12 +4,12 @@ require 'console_runner/version'
 
 # console_runner logic is here
 module ConsoleRunner
-  SEPARATOR = '==================================='.freeze
+  CommandLineParser.debug = ARGV.any? { |a| %w(-d --debug).include? a }
+  SEPARATOR               = '==================================='.freeze
   begin
     start_time     = Time.now
     success_status = true
     puts "#{SEPARATOR}\nStart Time: #{start_time}\n#{SEPARATOR}".blue
-
     file_from_arg = ARGV.shift
     raise ConsoleRunnerError, 'Specify file to be executed' unless file_from_arg
     file_path      = File.realpath file_from_arg

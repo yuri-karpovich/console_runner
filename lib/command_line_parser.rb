@@ -10,16 +10,15 @@ class CommandLineParser
   # Generate tool help menu.
   # IMPORTANT! Should be executed before ARGV.shift
   def initialize(file_parser)
-    @file_parser            = file_parser
-    @sub_commands           = @file_parser.runnable_methods.map { |m| m.name.to_s }
-    @sub_commands_text      = @file_parser.runnable_methods.map do |m|
+    @file_parser       = file_parser
+    @sub_commands      = @file_parser.runnable_methods.map { |m| m.name.to_s }
+    @sub_commands_text = @file_parser.runnable_methods.map do |m|
       [
         m.name.to_s,
         FileParser.select_runnable_tags(m).map(&:text).join("\n")
       ]
     end.to_h
-    @parser                 = Trollop::Parser.new
-    CommandLineParser.debug = ARGV.any? { |a| %w(-d --debug).include? a }
+    @parser            = Trollop::Parser.new
     @parser.opt(:debug, 'Run in debug mode.', type: :flag)
     @parser.stop_on @sub_commands
     @initialize_method = nil
