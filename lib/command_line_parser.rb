@@ -41,7 +41,7 @@ class CommandLineParser
       scope = ARGV[0..action_index] if action_index
     end
     return unless scope.any?{|a| %w(-h --help).include? a }
-    @parser.banner(banner)
+    @parser.banner("\n" + banner)
     Trollop::with_standard_exception_handling(@parser) { raise Trollop::HelpNeeded }
   end
 
