@@ -27,6 +27,10 @@ class CommandLineParser
     @debug
   end
 
+  def self.debug=(value)
+    @debug=value
+  end
+
   def tool_banner
     result = FileParser.select_runnable_tags(@file_parser.clazz).map(&:text).join("\n")
     result += "\n\nAvailable actions:\n"
@@ -45,7 +49,7 @@ class CommandLineParser
       action_index = ARGV.index(action)
       scope        = ARGV[0..action_index] if action_index
     end
-    @debug = ARGV.any? { |a| %w(-d --debug).include? a }
+    CommandLineParser.debug = ARGV.any? { |a| %w(-d --debug).include? a }
     return unless scope.any? { |a| %w(-h --help).include? a }
     @parser.banner("\n" + banner)
     Trollop::with_standard_exception_handling(@parser) { raise Trollop::HelpNeeded }
