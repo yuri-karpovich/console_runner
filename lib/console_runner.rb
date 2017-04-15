@@ -7,7 +7,8 @@ module ConsoleRunner
   begin
     start_time = Time.now
     success_status = true
-    puts "Start Time: #{start_time}"
+    puts "===================================
+    Start Time: #{start_time}".blue
 
     file_from_arg = ARGV.shift
     raise ConsoleRunnerError, 'Specify file to be executed' unless file_from_arg
@@ -65,7 +66,10 @@ module ConsoleRunner
       raise e
   ensure
     finish_time = Time.now
-    puts "Execution status: #{success_status ? 'Success' : 'Error' }"
-    puts "Finish Time: #{finish_time} (Duration: #{((finish_time - start_time) / 60).round(2) } minutes)"
+    status = success_status ? 'Success'.green : 'Error'.red
+    puts 'Execution status: '.blue + status
+    puts "===================================
+    Finish Time: #{finish_time} (Duration: #{((finish_time - start_time) / 60).round(2) } minutes)
+".blue
   end
 end

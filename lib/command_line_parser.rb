@@ -1,5 +1,6 @@
 require 'trollop'
 require 'method_parser'
+require 'colorize'
 
 # Parses command line and configure #Trollop
 class CommandLineParser
