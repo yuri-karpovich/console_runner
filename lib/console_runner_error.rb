@@ -7,5 +7,5 @@ class ConsoleRunnerError < StandardError
       @object
     end
   end
-  
+
 end
