@@ -7,12 +7,12 @@ class InstanceActionTest < BaseTestClass
   end
 
   def test_action_with_short_params
-    assert_runner :single_param_action, '-p name',init: true, action: true
+    assert_runner :single_param_action, '-p name', init: true, action: true
   end
 
   def test_action_missed_param
     action_key = :single_param_action
-    result = run_runner action_key, ''
+    result     = run_runner action_key, ''
     assert_equal 1, result[:exit_code]
     assert_match 'You must specify required parameter: parameter', result[:err].join
     refute_match init_text, result[:out].join
@@ -21,7 +21,7 @@ class InstanceActionTest < BaseTestClass
 
   def test_action_one_of_two_missed
     action_key = :two_params_action
-    result = run_runner action_key, '-a "another name"'
+    result     = run_runner action_key, '-a "another name"'
     assert_equal 1, result[:exit_code]
     assert_match 'You must specify required parameter: parameter', result[:err].join
     refute_match init_text, result[:out].join
@@ -38,7 +38,7 @@ class InstanceActionTest < BaseTestClass
 
   def test_action_unknown_param
     action_key = :single_param_action
-    result = run_runner action_key, '-p name -u unknown'
+    result     = run_runner action_key, '-p name -u unknown'
     assert_equal 1, result[:exit_code]
     assert_match "unknown argument '-u'", result[:err].join
     refute_match init_text, result[:out].join
@@ -47,7 +47,7 @@ class InstanceActionTest < BaseTestClass
 
   def test_action_help_menu_with_param
     action_key = :single_param_action
-    result = run_runner action_key, '-p name -h'
+    result     = run_runner action_key, '-p name -h'
     assert_equal 0, result[:exit_code]
     assert_match ACTION_HELP, result[:out].join
     assert_match '--parameter=<s>', result[:out].join
@@ -57,7 +57,7 @@ class InstanceActionTest < BaseTestClass
 
   def test_action_help_menu
     action_key = :single_param_action
-    result = run_runner action_key, '-h'
+    result     = run_runner action_key, '-h'
     assert_equal 0, result[:exit_code]
     assert_match ACTION_HELP, result[:out].join
     assert_match '--parameter=<s>', result[:out].join
@@ -67,7 +67,7 @@ class InstanceActionTest < BaseTestClass
 
   def test_action_not_runable
     action_key = :action_not_runnable
-    result = run_runner action_key, '-p name'
+    result     = run_runner action_key, '-p name'
     assert_equal 1, result[:exit_code]
     assert_match 'Cannot find any @runnable action', result[:err].join
     refute_match init_text, result[:out].join
@@ -88,7 +88,7 @@ class InstanceActionTest < BaseTestClass
 
   def test_options_hash_missed_param
     action_key = :action_with_options
-    result = run_runner action_key, '-f option1 --second-option option2'
+    result     = run_runner action_key, '-f option1 --second-option option2'
     assert_equal 1, result[:exit_code]
     assert_match 'You must specify required parameter: parameter', result[:err].join
     refute_match init_text, result[:out].join
@@ -97,7 +97,7 @@ class InstanceActionTest < BaseTestClass
 
   def test_same_name_param_option
     action_key = :same_param_name_action
-    result = run_runner action_key, '-p name --second-option option2'
+    result     = run_runner action_key, '-p name --second-option option2'
     assert_equal 1, result[:exit_code]
     assert_match(
       'You have the same name for @param and @option attribute(s): parameter. (ConsoleRunnerError)',
@@ -112,8 +112,21 @@ class InstanceActionTest < BaseTestClass
       :action_without_init,
       '',
       runnable_file: 'test/assets/runnable_class_wo_init.rb',
-      init: false, action: true
+      init:          false, action: true
     )
+  end
+
+  def test_params_types
+    result = assert_runner(
+      :say_hello,
+      '-d -n John --second-meet --prefix Mr.',
+      init: true
+    )
+    assert_match 'Hello, Mr. John. Nice to see you again!', result[:out].join
+  end
+
+  def test_same_name_of_option_and_param
+    skip
   end
 
 

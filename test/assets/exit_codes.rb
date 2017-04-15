@@ -16,6 +16,7 @@ module ExitCodes
     same_name_action:                    33,
     class_same_name_action:              34,
     same_param_name_action:              35,
-    class_same_param_name_action:        36
+    class_same_param_name_action:        36,
+    say_hello:                           37
   }.freeze
 end

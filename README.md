@@ -67,9 +67,10 @@ Or install it yourself as:
 Yes. Any text placed after `@runnable` tag will be displayed on the help page. You can add any additional information about how to use your tool there.
 > **Tip**: You can use multi-line text as well
 
-**Example:**
+##### Example:
 ```ruby
 # @runnable This tool can talk to you. Run it when you are lonely.
+#   Written in Ruby.  
 class MyClass
 
     def initialize
@@ -78,8 +79,9 @@ class MyClass
     end
     
     # @runnable Say 'Hello' to you.
-    def say_hello
-      puts @hello_msg
+    # @param [String] name Your name
+    def say_hello(name)
+      puts @hello_msg + ', ' + name
     end
     
     # @runnable Say 'Good Bye' to you.
@@ -91,11 +93,124 @@ end
 ```
 
 ```bash
-TODO example
+ ~> c_run /projects/example/my_class.rb  --help
+Options:
+  --debug    Run in debug mode.
+
+This tool can talk to you. Run it when you are lonely.
+Written in Ruby.
+
+Available actions:
+        - say_hello
+                Say 'Hello' to you.
+        - say_bye
+                Say 'Good Bye' to you.
 ```
 
-## ToDo
-- fix help menu for action: action help text should be displayed, list of available actions should be displayed
+```bash
+ ~> c_run /projects/example/my_class.rb  say_hello -h
+Options:
+  -d, --debug    Run in debug mode.
+  -h, --help     Show this message
+  --name=<s>     (Ruby class: String) Your name
+
+Say 'Hello' to you.
+
+```
+#### **Can I send parameters to my methods?**
+Yes, `console_runner` parses YARD annotation (`@param` and `@option` tags) and check the list of parameters for your method.
+
+> *Restriction*: You can use Hash parameters as well (for storing options). But you cannot use the same name for parameter and for option. 
+> 
+> For example, `def limit(number, options = {number: 5})...` - `number` name is not allowed. You should use another parameter name.
+
+##### Example:
+```ruby
+# @runnable This tool can talk to you. Run it when you are lonely.
+#   Written in Ruby.  
+class MyClass
+
+    def initialize
+      @hello_msg = 'Hello' 
+      @bye_msg = 'Good Bye' 
+    end
+    
+    # @runnable Say 'Hello' to you.
+    # @param [String] name Your name
+    # @param [Hash] options options
+    # @option options [Boolean] :second_meet Have you met before?
+    # @option options [String] :prefix Your custom prefix
+    def say_hello(name, options = {})
+      second_meet = nil
+      second_meet = 'Nice to see you again!' if options['second_meet']
+      prefix = options['prefix']
+      message = @hello_msg + ', '
+      message += "#{prefix} " if prefix
+      message += "#{name}. "
+      message += second_meet if second_meet
+      puts message
+    end
+    
+end
+```
+```bash
+~> c_run /projects/example/my_class.rb  say_hello -h 
+Options:
+  -d, --debug      Run in debug mode.
+  -h, --help       Show this message
+  --name=<s>       (Ruby class: String) Your name
+  --second-meet    (Ruby class: Boolean) Have you met before?
+  --prefix=<s>     (Ruby class: String) Your custom prefix
+
+Say 'Hello' to you.
+```
+```bash
+~> c_run /projects/example/my_class.rb  say_hello -n John --second-meet --prefix Mr. 
+Hello, Mr. John. Nice to see you again!
+```
+
+#### **Can I use optional parameters?**
+Yes. All parameters with `@option` YARD tag are optional. 
+
+`--second-meet` and `--prefix` parameters are optional in the following example:
+```ruby
+# @runnable Say 'Hello' to you.
+    # @param [String] name Your name
+    # @param [Hash] options options
+    # @option options [Boolean] :second_meet Have you met before?
+    # @option options [String] :prefix Your custom prefix
+```
+Another approach is to use *default values* for parameters. 
+Parameter `--name` in the following example is optional because it has the default value `Chuck`.
+```ruby
+    # @runnable Say 'Hello' to you.
+    # @param [String] name Your name
+    # @param [Hash] options options
+    # @option options [Boolean] :second_meet Have you met before?
+    # @option options [String] :prefix Your custom prefix
+    def say_hello(name = 'Chuck', options = {})
+      second_meet = nil
+      second_meet = 'Nice to see you again!' if options['second_meet']
+      prefix = options['prefix']
+      message = @hello_msg + ', '
+      message += "#{prefix} " if prefix
+      message += "#{name}. "
+      message += second_meet if second_meet
+      puts message
+    end
+```
+```bash
+-> c_run /projects/example/my_class.rb  say_hello  
+Hello, Chuck. 
+```
+#### **Is it works only for class methods?**
+`console_runner` works with both methods - class and instance methods. It's clear how it works with class method - method is called without any preconditions.
+Class method will be called in accordance with following logic:
+ 1. call `:initialize` method 
+ 2. cal action method
+
+#### **My `require` code doesn't work well. How can I fix it?**
+Use `require_relative ` method instead.
 
 ## Development
 

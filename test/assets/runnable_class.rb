@@ -156,4 +156,21 @@ class RunnableClass
     puts "#{CLASS_ACTION_MESSAGE}: #{action_name}"
     exit EXIT_CODES[action_name]
   end
+
+  # @runnable Say 'Hello' to you.
+  # @param [String] name Your name
+  # @param [Hash] options options
+  # @option options [Boolean] :second_meet Have you met before?
+  # @option options [String] :prefix Your custom prefix
+  def say_hello(name, options = {})
+    second_meet = nil
+    second_meet = 'Nice to see you again!' if options['second_meet']
+    prefix = options['prefix']
+    message = 'Hello, '
+    message += "#{prefix} " if prefix
+    message += "#{name}. "
+    message += second_meet if second_meet
+    puts message
+    exit EXIT_CODES[:say_hello]
+  end
 end

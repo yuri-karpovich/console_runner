@@ -76,7 +76,9 @@ class CommandLineParser
       given_attrs     = cmd_opts.keys.select { |k| k.to_s.include? '_given' }.map { |k| k.to_s.gsub('_given', '').to_sym }
       method.cmd_opts = cmd_opts.select { |k, _| given_attrs.include? k }
       method.default_values.each do |k, v|
-        method.cmd_opts[k.to_sym] ||= v
+        param_name = k.to_sym
+        next if method.option_tags.map(&:name).include?(param_name.to_s)
+        method.cmd_opts[param_name] ||= v
       end
       method.required_parameters.each do |required_param|
         next if method.options_group? required_param

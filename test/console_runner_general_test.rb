@@ -85,4 +85,19 @@ class ConsoleRunnerTest < BaseTestClass
     refute_match init_text, result[:out].join
   end
 
+  def test_run_method
+    skip
+  end
+
+  def test_initialize_params
+    skip
+  end
+
+  def test_same_params_in_action_and_init
+    skip
+  end
+
+  def test_only_init_method_presented
+    skip
+  end
 end
