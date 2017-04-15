@@ -72,4 +72,17 @@ class ConsoleRunnerTest < BaseTestClass
     assert_match "#{action} method execution", result[:out].join
   end
 
+  def test_cr_error_debug
+    result = run_runner :same_name_action, '-d'
+    assert_equal 1, result[:exit_code]
+    assert_match(
+      'Class and Instance methods have the same name',
+      result[:err].join
+    )
+    assert_match ":in `<main>'", result[:err].join
+    refute_match class_action_text(''), result[:out].join
+    refute_match action_text(''), result[:out].join
+    refute_match init_text, result[:out].join
+  end
+
 end
