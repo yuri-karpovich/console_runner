@@ -29,7 +29,9 @@ class CommandLineParser
   end
 
   def self.debug=(value)
-    @debug = value unless @debug
+    return if @debug
+    ENV['CR_DEBUG'] = 'true'
+    @debug          = value
   end
 
   def tool_banner

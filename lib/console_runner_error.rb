@@ -1,11 +1,11 @@
 class ConsoleRunnerError < StandardError
 
-  def backtrace(debug = CommandLineParser.debug?)
-    if debug
+  def backtrace
+    if ENV['CR_DEBUG'].to_s == 'true'
       super
     else
       @object
     end
   end
-
+  
 end
