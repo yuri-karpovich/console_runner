@@ -7,6 +7,7 @@
 
 This gem provides you an ability to run any Ruby method from command-line. No special code modifications required!.
 `console_runner` is a smart mix of [YARD](http://yardoc.org/) and [Trollop](http://manageiq.github.io/trollop/) gems. 
+It's an analog of [Python Fire](https://github.com/google/python-fire) in Ruby language.  
 > 1. it parses [YARD](http://yardoc.org/) annotations of classes and methods to 'understand' your code
 > 2. it generates friendly unix-like help menu for your tool (using [Trollop](http://manageiq.github.io/trollop/) gem)
 > 3. it parses command-line input and run your Ruby code in a proper way 
