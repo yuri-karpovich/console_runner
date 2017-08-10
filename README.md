@@ -205,10 +205,10 @@ Parameter `--name` in the following example is optional because it has the defau
 Hello, Chuck. 
 ```
 #### **Is it works only for class methods?**
-`console_runner` works with both methods - class and instance methods. It's clear how it works with class method - method is called without any preconditions.
-Class method will be called in accordance with following logic:
+`console_runner` works with both methods - **class** and **instance** methods. It's clear how it works with **class** method - method is called without any preconditions.
+**Instance** method will be called in accordance with following logic:
  1. call `:initialize` method 
- 2. cal action method
+ 2. call specified action method
 
 #### **My `require` code doesn't work well. How can I fix it?**
 Use `require_relative ` method instead.
