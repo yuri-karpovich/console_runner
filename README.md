@@ -1,7 +1,6 @@
 # ConsoleRunner
 [![Gem Version][GV img]][Gem Version]
 [![Build Status][BS img]][Build Status]
-[![Dependency Status][DS img]][Dependency Status]
 [![Code Climate][CC img]][Code Climate]
 [![Coverage Status][CS img]][Coverage Status]
 
