@@ -1,4 +1,4 @@
-# ConsoleRunner
+# ConsoleRunner [CLI for any *.rb]
 [![Gem Version][GV img]][Gem Version]
 [![Build Status][BS img]][Build Status]
 [![Code Climate][CC img]][Code Climate]
