@@ -68,8 +68,8 @@ class ConsoleRunnerTest < BaseTestClass
     refute_match class_action_text(action), result[:out].join
     assert_match action_text(action), result[:out].join
     assert_match init_text, result[:out].join
-    assert_match 'debug = true', result[:out].join
-    assert_match "#{action} method execution", result[:out].join
+    assert_match 'debug = true', result[:err].join
+    assert_match "Executing ##{action} method...", result[:err].join
   end
 
   def test_cr_error_debug
