@@ -41,5 +41,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'optimist', '~> 3.0'
   spec.add_dependency 'yard', '~> 0.9'
   spec.add_dependency 'colorize', '~> 0.8'
-  spec.add_dependency 'tty-logger'
+  spec.add_dependency 'tty-logger', '~> 0'
 end
