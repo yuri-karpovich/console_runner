@@ -6,7 +6,7 @@ class MethodParser
               :parameters,
               :param_tags, # All method parameters tags
               :option_tags, # Only options tags
-              :trollop_opts,
+              :optimist_opts,
               :default_values,
               :required_parameters
 
@@ -44,10 +44,10 @@ class MethodParser
 Use different names to `console_runner` be able to run #{@name} method."
       )
     end
-    @trollop_opts = prepare_opts_for_trollop
+    @optimist_opts = prepare_opts_for_optimist
   end
 
-  def prepare_opts_for_trollop
+  def prepare_opts_for_optimist
     result = []
     param_tags.each do |tag|
       tag_name = tag.name

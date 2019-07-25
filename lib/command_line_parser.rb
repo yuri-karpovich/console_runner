@@ -1,8 +1,8 @@
-require 'trollop'
+require 'optimist'
 require 'method_parser'
 require 'colorize'
 
-# Parses command line and configure #Trollop
+# Parses command line and configure #Optimist
 class CommandLineParser
   attr_reader :method, :initialize_method
   @debug = false
@@ -14,11 +14,11 @@ class CommandLineParser
     @sub_commands      = @file_parser.runnable_methods.map { |m| m.name.to_s }
     @sub_commands_text = @file_parser.runnable_methods.map do |m|
       [
-        m.name.to_s,
-        FileParser.select_runnable_tags(m).map(&:text).join("\n")
+          m.name.to_s,
+          FileParser.select_runnable_tags(m).map(&:text).join("\n")
       ]
     end.to_h
-    @parser            = Trollop::Parser.new
+    @parser            = Optimist::Parser.new
     @parser.opt(:debug, 'Run in debug mode.', type: :flag)
     @parser.stop_on @sub_commands
     @initialize_method = nil
@@ -54,7 +54,7 @@ class CommandLineParser
     end
     return unless scope.any? { |a| %w(-h --help).include? a }
     @parser.banner("\n" + banner)
-    Trollop::with_standard_exception_handling(@parser) { raise Trollop::HelpNeeded }
+    Optimist::with_standard_exception_handling(@parser) { raise Optimist::HelpNeeded }
   end
 
   def raise_on_action_absence(sub_commands)
@@ -70,7 +70,7 @@ class CommandLineParser
     @method            = MethodParser.new action
     [@initialize_method, @method].each do |method|
       next unless method
-      method.trollop_opts.each { |a| @parser.opt(*a) }
+      method.optimist_opts.each { |a| @parser.opt(*a) }
       maybe_help(method.text, action.name.to_s)
       cmd_opts        = @parser.parse ARGV
       given_attrs     = cmd_opts.keys.select { |k| k.to_s.include? '_given' }.map { |k| k.to_s.gsub('_given', '').to_sym }
