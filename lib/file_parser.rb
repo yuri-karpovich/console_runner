@@ -6,6 +6,7 @@ class FileParser
   RUNNABLE_TAG = :runnable
 
   attr_reader :clazz,
+              :constants,
               :runnable_methods,
               :initialize_method,
               :run_method
@@ -21,6 +22,7 @@ class FileParser
     runnable_classes = list_classes(:runnable)
     raise ConsoleRunnerError, 'At least one runnable Class should be specified in file' if runnable_classes.count != 1
     @clazz             = runnable_classes.first
+    @constants         = @clazz.constants
     all_methods        = list_methods(:all, clazz)
     @runnable_methods  = list_methods(:runnable, clazz)
     @initialize_method = all_methods.find { |m| m.name == :initialize }
@@ -47,20 +49,20 @@ class FileParser
     all_class_methods = clazz.children.select { |m| m.class == YARD::CodeObjects::MethodObject } if clazz
 
     case scope
-      when :all
-        if clazz
-          all_class_methods
-        else
-          all_methods
-        end
-      when RUNNABLE_TAG
-        if clazz
-          all_class_methods.select { |m| m.has_tag? RUNNABLE_TAG }
-        else
-          all_methods.select { |m| m.has_tag? RUNNABLE_TAG }
-        end
+    when :all
+      if clazz
+        all_class_methods
       else
-        raise ":scope can be :all or #{RUNNABLE_TAG}"
+        all_methods
+      end
+    when RUNNABLE_TAG
+      if clazz
+        all_class_methods.select { |m| m.has_tag? RUNNABLE_TAG }
+      else
+        all_methods.select { |m| m.has_tag? RUNNABLE_TAG }
+      end
+    else
+      raise ":scope can be :all or #{RUNNABLE_TAG}"
     end
   end
 
@@ -68,15 +70,15 @@ class FileParser
   #
   # @param [Symbol] scope :all - list all classes, :runnable - list only runnable classes
   # @return [Array(YARD::CodeObjects::ClassObject)]
-  def list_classes(scope= :all)
+  def list_classes(scope = :all)
     all_classes = @all_objects.select { |o| o.type == :class }
     case scope
-      when :all
-        all_classes
-      when RUNNABLE_TAG
-        all_classes.select { |m| m.has_tag? RUNNABLE_TAG }
-      else
-        raise ":scope can be :all or #{RUNNABLE_TAG}"
+    when :all
+      all_classes
+    when RUNNABLE_TAG
+      all_classes.select { |m| m.has_tag? RUNNABLE_TAG }
+    else
+      raise ":scope can be :all or #{RUNNABLE_TAG}"
     end
   end
 

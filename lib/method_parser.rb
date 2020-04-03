@@ -13,16 +13,16 @@ class MethodParser
   attr_accessor :cmd_opts
 
   TYPES_MAPPINGS = {
-    'String'         => :string,
-    'Integer'        => :int,
-    'Fixnum'         => :int,
-    'Float'          => :float,
-    'Boolean'        => :boolean,
-    'Array(String)'  => :strings,
-    'Array(Integer)' => :ints,
-    'Array(Fixnum)'  => :ints,
-    'Array(Float)'   => :floats,
-    'Array(Boolean)' => :booleans
+      'String'         => :string,
+      'Integer'        => :int,
+      'Fixnum'         => :int,
+      'Float'          => :float,
+      'Boolean'        => :boolean,
+      'Array(String)'  => :strings,
+      'Array(Integer)' => :ints,
+      'Array(Fixnum)'  => :ints,
+      'Array(Float)'   => :floats,
+      'Array(Boolean)' => :booleans
   }.freeze
 
   # @param [YARD::CodeObjects::MethodObject] method YARD method object to be parsed
@@ -31,16 +31,16 @@ class MethodParser
     @name                = @method.name
     @text                = FileParser.select_runnable_tags(@method).map(&:text).join("\n")
     @parameters          = @method.parameters
-    @default_values      = default_params
+    @default_values      = default_params.reject { |k, v| v.nil? }
     @param_tags          = FileParser.select_param_tags @method
     @option_tags         = FileParser.select_option_tags @method
-    @required_parameters = @param_tags.select { |t| t.tag_name == 'param' }.map(&:name)
+    @required_parameters = @param_tags.select { |t| t.tag_name == 'param' && !@default_values.keys.include?(t.name) }.map(&:name)
     @cmd_opts            = nil
     same_params          = param_tags_names & option_tags_names
     unless same_params.count.zero?
       raise(
-        ConsoleRunnerError,
-        "You have the same name for @param and @option attribute(s): #{same_params.join(', ')}.
+          ConsoleRunnerError,
+          "You have the same name for @param and @option attribute(s): #{same_params.join(', ')}.
 Use different names to `console_runner` be able to run #{@name} method."
       )
     end
@@ -61,23 +61,23 @@ Use different names to `console_runner` be able to run #{@name} method."
             option_text = option.pair.text
             option_type = option.pair.type
             result << [
-              option_name.to_sym,
-              "(Ruby class: #{option_type}) " + option_text.to_s,
-              type: parse_type(option_type)
+                option_name.to_sym,
+                "(Ruby class: #{option_type}) " + option_text.to_s,
+                type: parse_type(option_type)
             ]
           end
         else
           result << [
-            tag_name.to_sym,
-            "(Ruby class: #{tag_type}) " + tag_text.to_s,
-            type: parse_type(tag_type)
+              tag_name.to_sym,
+              "(Ruby class: #{tag_type}) " + tag_text.to_s,
+              type: parse_type(tag_type)
           ]
         end
       else
         result << [
-          tag_name.to_sym,
-          "(Ruby class: #{tag_type}) " + tag_text.to_s,
-          type: parse_type(tag_type)
+            tag_name.to_sym,
+            "(Ruby class: #{tag_type}) " + tag_text.to_s,
+            type: parse_type(tag_type)
         ]
       end
     end

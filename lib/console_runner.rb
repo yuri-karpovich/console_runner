@@ -40,7 +40,7 @@ module ConsoleRunner
       c_line_parser.initialize_method.cmd_opts.map { |k, v| LOGGER.debug "\t#{k} = #{v}" }
     end
     LOGGER.debug "Executing ##{action.name} method..."
-    c_line_parser.method.cmd_opts.map { |k, v| LOGGER.debug  "\t#{k} = #{v}" }
+    c_line_parser.method.cmd_opts.map { |k, v| LOGGER.debug "\t#{k} = #{v}" }
     LOGGER.debug("Remaining arguments: #{ARGV.inspect}") if ARGV != []
     LOGGER.info SEPARATOR
 
@@ -75,6 +75,8 @@ module ConsoleRunner
       LOGGER.success 'Execution status: ' + status
     else
       LOGGER.error 'Execution status: ' + status
+      LOGGER.error e.message if e
+      LOGGER.error SEPARATOR
     end
 
   end

@@ -20,6 +20,7 @@ class RunnableClass
   INITIALIZER_MESSAGE  = 'IN INITIALIZE METHOD'.freeze
   ACTION_MESSAGE       = 'IN ACTION METHOD'.freeze
   CLASS_ACTION_MESSAGE = 'IN CLASS ACTION METHOD'.freeze
+  DEFAULT_CONSTANT     = 'default'.freeze
 
   # This method is executed in case you perform instance action.
   # It's not necessary to mark this method with @runnable tag.
@@ -143,6 +144,41 @@ class RunnableClass
     class_action :class_same_param_name_action
   end
 
+  # @runnable
+  #
+  # @param [String] parameter_one Parameter 1 name
+  # @param [String] parameter_two Parameter 2 name
+  def self.class_constant_in_param(parameter_one, parameter_two = DEFAULT_CONSTANT)
+    class_action :class_constant_in_param
+  end
+
+  # @runnable
+  #
+  # @param [String] parameter_one Parameter 1 name
+  # @option options [String] :first_option option name
+  # @option options [String] :parameter parameter name
+  def self.class_constant_in_options(parameter_one, options = { first_option: DEFAULT_CONSTANT })
+    class_action :class_constant_in_options
+  end
+
+
+  # @runnable
+  #
+  # @param [String] parameter_one Parameter 1 name
+  # @param [String] parameter_two Parameter 2 name
+  def constant_in_param(parameter_one, parameter_two = DEFAULT_CONSTANT)
+    action :constant_in_param
+  end
+
+  # @runnable
+  #
+  # @param [String] parameter_one Parameter 1 name
+  # @option options [String] :first_option option name
+  # @option options [String] :parameter parameter name
+  def constant_in_options(parameter_one, options = { first_option: DEFAULT_CONSTANT })
+    action :constant_in_options
+  end
+
   private
 
   def action(action_key)
@@ -165,11 +201,11 @@ class RunnableClass
   def say_hello(name, options = {})
     second_meet = nil
     second_meet = 'Nice to see you again!' if options['second_meet']
-    prefix = options['prefix']
-    message = 'Hello, '
-    message += "#{prefix} " if prefix
-    message += "#{name}. "
-    message += second_meet if second_meet
+    prefix      = options['prefix']
+    message     = 'Hello, '
+    message     += "#{prefix} " if prefix
+    message     += "#{name}. "
+    message     += second_meet if second_meet
     puts message
     exit EXIT_CODES[:say_hello]
   end

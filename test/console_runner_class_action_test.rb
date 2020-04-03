@@ -103,4 +103,52 @@ class ClassActionTest < BaseTestClass
     refute_match class_action_text(action_key), result[:out].join
   end
 
+  def test_class_constant_in_param
+    action_key = :class_constant_in_param
+    result     = run_runner action_key, '--parameter-one name'
+    assert_equal 1, result[:exit_code]
+    assert_match(
+        'Constants as default params values are not supported by console_runner: DEFAULT_CONSTANT',
+        result[:err].join
+    )
+    refute_match class_action_text(action_key), result[:out].join
+  end
+
+
+  def test_class_constant_in_options
+    skip
+    action_key = :class_constant_in_options
+    result     = run_runner action_key, '--parameter-one name'
+    assert_equal 1, result[:exit_code]
+    assert_match(
+        'Constants as default params values are not supported by console_runner: DEFAULT_CONSTANT',
+        result[:err].join
+    )
+    refute_match class_action_text(action_key), result[:out].join
+  end
+
+  def test_constant_in_param
+    action_key = :constant_in_param
+    result     = run_runner action_key, '--parameter-one name'
+    assert_equal 1, result[:exit_code]
+    assert_match(
+        'Constants as default params values are not supported by console_runner: DEFAULT_CONSTANT',
+        result[:err].join
+    )
+    refute_match class_action_text(action_key), result[:out].join
+  end
+
+
+  def test_constant_in_options
+    skip
+    action_key = :constant_in_options
+    result     = run_runner action_key, '--parameter-one name'
+    assert_equal 1, result[:exit_code]
+    assert_match(
+        'Constants as default params values are not supported by console_runner: DEFAULT_CONSTANT',
+        result[:err].join
+    )
+    refute_match class_action_text(action_key), result[:out].join
+  end
+
 end
