@@ -6,15 +6,12 @@
 
 This gem provides you an ability to run any Ruby method from command-line. No special code modifications required!.
 `console_runner` is a smart mix of [YARD](http://yardoc.org/) and [Optimist](http://manageiq.github.io/optimist/) gems. 
-It's an analog of [Python Fire](https://github.com/google/python-fire) in Ruby language.  
+It's an analog of [Python Fire](https://github.com/google/python-fire) but for Ruby.  
 > 1. it parses [YARD](http://yardoc.org/) annotations of classes and methods to 'understand' your code
 > 2. it generates friendly unix-like help menu for your tool (using [Optimist](http://manageiq.github.io/optimist/) gem)
 > 3. it parses command-line input and run your Ruby code in a proper way 
 
-Just 4 simple steps to make your code runnable from terminal:
-1. Just add `@runnable` tag in 
-
-One thing you need to do is to add an [YARD](http://yardoc.org/) tag annotation `@runnable`.
+One thing you need to do is to add `@runnable` tag to your method annotation.
 
 ## Usage
 `console_runner` extends [YARD](http://yardoc.org/) with a new tag: `@runnable`. You need to set this tag in a Class and Method annotation. After that it will be possible to call this method from command-line.
